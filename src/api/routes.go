@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	models2 "github.com/loupeznik/better-wapi/src/api/models"
+	requests "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/models"
 	"github.com/loupeznik/better-wapi/src/services"
 	"net/http"
@@ -21,7 +21,7 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 		})
 
 		api.PUT("/domain", func(c *gin.Context) {
-			var request models2.UpdateRequest
+			var request requests.UpdateRequest
 			err := c.ShouldBindJSON(&request)
 
 			if err != nil {
@@ -30,8 +30,8 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 
 			updateResult := integrationService.UpdateRecord(request.Domain, request.IP)
 
-			c.JSON(updateResult, gin.H{
-				"message": updateResult,
+			c.JSON(http.StatusOK, gin.H{
+				"data": updateResult,
 			})
 		})
 

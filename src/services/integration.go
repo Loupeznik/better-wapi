@@ -1,10 +1,9 @@
 package services
 
 import (
-	"bytes"
 	"crypto/sha1"
-	"encoding/json"
 	"fmt"
+	"github.com/loupeznik/better-wapi/src/helpers"
 	"github.com/loupeznik/better-wapi/src/models"
 	"io"
 	"log"
@@ -29,54 +28,22 @@ func NewIntegrationService(config *models.Config) *service {
 	return &service{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *service) UpdateRecord(domainName string, newIp string) int {
+func (s *service) UpdateRecord(domainName string, newIp string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
-	client := http.Client{Timeout: time.Duration(60) * time.Second}
-	request := models.Request{Body: models.RequestBody{
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+	request := &models.Request{Body: models.RequestBody{
 		Login:   s.config.WApiUsername,
 		Secret:  token,
 		Command: "dns-row-update",
 		Data: models.RequestData{
 			Domain: domainName,
-			RowID:  20,
-			TTL:    20,
+			RowID:  1724,
+			TTL:    1800,
 			Type:   "A",
 			IP:     newIp},
 	}}
 
-	jsonBody, err := json.Marshal(request)
-
-	if err != nil {
-		panic(err)
-	}
-
-	result, err := client.Post(s.baseUrl, "application/x-www-form-urlencoded", bytes.NewBuffer(jsonBody))
-
-	if err != nil {
-		panic(err)
-	}
-
-	return result.StatusCode
-}
-
-func (s *service) GetInfo(domainName string) string {
-	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
-	client := http.Client{Timeout: time.Duration(60) * time.Second}
-	request := models.Request{Body: models.RequestBody{
-		Login:   s.config.WApiUsername,
-		Secret:  token,
-		Command: "dns-rows-list",
-		Data: models.RequestData{
-			Domain: domainName},
-	}}
-
-	jsonBody, err := json.Marshal(request)
-
-	if err != nil {
-		panic(err)
-	}
-
-	result, err := client.Post(fmt.Sprintf("%s?request=%s", s.baseUrl, jsonBody), "application/x-www-form-urlencoded", nil)
+	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
 
 	if err != nil {
 		panic(err)
@@ -87,10 +54,10 @@ func (s *service) GetInfo(domainName string) string {
 		if err != nil {
 
 		}
-	}(result.Body)
+	}(response.Body)
 
-	if result.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(result.Body)
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(response.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -98,7 +65,43 @@ func (s *service) GetInfo(domainName string) string {
 		return string(bodyBytes)
 	}
 
-	return ""
+	return response.Status
+}
+
+func (s *service) GetInfo(domainName string) string {
+	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+	request := &models.Request{Body: models.RequestBody{
+		Login:   s.config.WApiUsername,
+		Secret:  token,
+		Command: "dns-rows-list",
+		Data: models.RequestData{
+			Domain: domainName},
+	}}
+
+	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(response.Body)
+
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return string(bodyBytes)
+	}
+
+	return response.Status
 }
 
 func getApiToken(username string, password string) string {
