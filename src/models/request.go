@@ -12,9 +12,10 @@ type RequestBody struct {
 }
 
 type RequestData struct {
-	Domain string `json:"domain"`
-	TTL    int    `json:"ttl,omitempty"`
-	Type   string `json:"type,omitempty"`
-	RowID  int    `json:"row_id,omitempty"`
-	IP     string `json:"rdata,omitempty"`
+	Domain    string `json:"domain"`
+	Subdomain string `json:"name,omitempty"`
+	TTL       int    `json:"ttl,omitempty"`
+	Type      string `json:"type,omitempty"`
+	RowID     int    `json:"row_id,omitempty"`
+	IP        string `json:"rdata,omitempty"`
 }

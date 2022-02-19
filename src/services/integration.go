@@ -28,6 +28,46 @@ func NewIntegrationService(config *models.Config) *service {
 	return &service{config: config, baseUrl: wapiBaseUrl}
 }
 
+func (s *service) CreateRecord(domainName string, subdomainName string, newIp string) string {
+	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+	request := &models.Request{Body: models.RequestBody{
+		Login:   s.config.WApiUsername,
+		Secret:  token,
+		Command: "dns-row-add",
+		Data: models.RequestData{
+			Domain:    domainName,
+			Subdomain: subdomainName,
+			TTL:       1800,
+			Type:      "A",
+			IP:        newIp},
+	}}
+
+	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(response.Body)
+
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return string(bodyBytes)
+	}
+
+	return response.Status
+}
+
 func (s *service) UpdateRecord(domainName string, newIp string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
@@ -41,6 +81,43 @@ func (s *service) UpdateRecord(domainName string, newIp string) string {
 			TTL:    1800,
 			Type:   "A",
 			IP:     newIp},
+	}}
+
+	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+
+		}
+	}(response.Body)
+
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		return string(bodyBytes)
+	}
+
+	return response.Status
+}
+
+func (s *service) DeleteRecord(domainName string) string {
+	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+	request := &models.Request{Body: models.RequestBody{
+		Login:   s.config.WApiUsername,
+		Secret:  token,
+		Command: "dns-row-delete",
+		Data: models.RequestData{
+			Domain: domainName,
+			RowID:  1724},
 	}}
 
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))

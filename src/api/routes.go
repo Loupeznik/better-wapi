@@ -44,5 +44,30 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 				"data": getInfoResult,
 			})
 		})
+
+		api.POST("/domain", func(c *gin.Context) {
+			var request requests.CreateRequest
+			err := c.ShouldBindJSON(&request)
+
+			if err != nil {
+				c.AbortWithStatus(http.StatusBadRequest)
+			}
+
+			result := integrationService.CreateRecord(request.Domain, request.Subdomain, request.IP)
+
+			c.JSON(http.StatusOK, gin.H{
+				"data": result,
+			})
+		})
+
+		api.DELETE("/domain/:domain", func(c *gin.Context) {
+			domain := c.Param("domain")
+
+			result := integrationService.DeleteRecord(domain)
+
+			c.JSON(http.StatusOK, gin.H{
+				"data": result,
+			})
+		})
 	}
 }
