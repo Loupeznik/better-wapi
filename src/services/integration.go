@@ -18,17 +18,17 @@ type IntegrationService interface {
 	GetInfo()
 }
 
-type service struct {
+type integrationService struct {
 	config  *models.Config
 	baseUrl string
 }
 
-func NewIntegrationService(config *models.Config) *service {
+func NewIntegrationService(config *models.Config) *integrationService {
 	wapiBaseUrl := "https://api.wedos.com/wapi/json"
-	return &service{config: config, baseUrl: wapiBaseUrl}
+	return &integrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *service) CreateRecord(domainName string, subdomainName string, newIp string) string {
+func (s *integrationService) CreateRecord(domainName string, subdomainName string, newIp string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -68,7 +68,7 @@ func (s *service) CreateRecord(domainName string, subdomainName string, newIp st
 	return response.Status
 }
 
-func (s *service) UpdateRecord(domainName string, newIp string) string {
+func (s *integrationService) UpdateRecord(domainName string, newIp string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -108,7 +108,7 @@ func (s *service) UpdateRecord(domainName string, newIp string) string {
 	return response.Status
 }
 
-func (s *service) DeleteRecord(domainName string) string {
+func (s *integrationService) DeleteRecord(domainName string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -145,7 +145,7 @@ func (s *service) DeleteRecord(domainName string) string {
 	return response.Status
 }
 
-func (s *service) GetInfo(domainName string) string {
+func (s *integrationService) GetInfo(domainName string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{

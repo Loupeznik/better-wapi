@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/loupeznik/better-wapi/src/api/middleware"
 	requests "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/models"
 	"github.com/loupeznik/better-wapi/src/services"
@@ -11,7 +12,7 @@ import (
 func SetupRoutes(config *models.Config, router *gin.Engine) {
 	integrationService := services.NewIntegrationService(config)
 
-	api := router.Group("/api")
+	api := router.Group("/api", middleware.Authorize(config))
 	{
 		api.GET("/test", func(c *gin.Context) {
 
