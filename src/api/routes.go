@@ -21,15 +21,16 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 			})
 		})
 
-		api.PUT("/domain", func(c *gin.Context) {
-			var request requests.UpdateRequest
+		api.PUT("/domain/:domain/record", func(c *gin.Context) {
+			domain := c.Param("domain")
+			var request requests.SaveRowRequest
 			err := c.ShouldBindJSON(&request)
 
 			if err != nil {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
-			updateResult := integrationService.UpdateRecord(request.Domain, request.IP)
+			updateResult := integrationService.UpdateRecord(domain, request.Subdomain, request.IP)
 
 			c.JSON(http.StatusOK, gin.H{
 				"data": updateResult,
@@ -46,25 +47,38 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 			})
 		})
 
-		api.POST("/domain", func(c *gin.Context) {
-			var request requests.CreateRequest
+		api.GET("/domain/:domain/:subdomain/info", func(c *gin.Context) {
+			domain := c.Param("domain")
+			subdomain := c.Param("subdomain")
+
+			getRecordResult := integrationService.GetRecord(domain, subdomain)
+
+			c.JSON(http.StatusOK, gin.H{
+				"data": getRecordResult,
+			})
+		})
+
+		api.POST("/domain/:domain/record", func(c *gin.Context) {
+			domain := c.Param("domain")
+			var request requests.SaveRowRequest
 			err := c.ShouldBindJSON(&request)
 
 			if err != nil {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
-			result := integrationService.CreateRecord(request.Domain, request.Subdomain, request.IP)
+			result := integrationService.CreateRecord(domain, request.Subdomain, request.IP)
 
 			c.JSON(http.StatusOK, gin.H{
 				"data": result,
 			})
 		})
 
-		api.DELETE("/domain/:domain", func(c *gin.Context) {
+		api.DELETE("/domain/:domain/record", func(c *gin.Context) {
 			domain := c.Param("domain")
+			var request requests.SaveRowRequest
 
-			result := integrationService.DeleteRecord(domain)
+			result := integrationService.DeleteRecord(domain, request.Subdomain)
 
 			c.JSON(http.StatusOK, gin.H{
 				"data": result,

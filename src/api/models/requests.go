@@ -1,12 +1,6 @@
 package models
 
-type UpdateRequest struct {
-	Domain string `json:"domain"`
-	IP     string `json:"ip"`
-}
-
-type CreateRequest struct {
-	Domain    string `json:"domain"`
+type SaveRowRequest struct {
 	Subdomain string `json:"subdomain"`
 	IP        string `json:"ip"`
 }

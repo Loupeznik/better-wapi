@@ -2,12 +2,14 @@ package services
 
 import (
 	"crypto/sha1"
+	"encoding/json"
 	"fmt"
 	"github.com/loupeznik/better-wapi/src/helpers"
 	"github.com/loupeznik/better-wapi/src/models"
 	"io"
 	"log"
 	"net/http"
+	"strconv"
 	"time"
 )
 
@@ -16,6 +18,7 @@ type IntegrationService interface {
 	UpdateRecord()
 	DeleteRecord()
 	GetInfo()
+	GetRecord()
 }
 
 type integrationService struct {
@@ -28,7 +31,7 @@ func NewIntegrationService(config *models.Config) *integrationService {
 	return &integrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *integrationService) CreateRecord(domainName string, subdomainName string, newIp string) string {
+func (s *integrationService) CreateRecord(domain string, subdomain string, ip string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -36,11 +39,11 @@ func (s *integrationService) CreateRecord(domainName string, subdomainName strin
 		Secret:  token,
 		Command: "dns-row-add",
 		Data: models.RequestData{
-			Domain:    domainName,
-			Subdomain: subdomainName,
+			Domain:    domain,
+			Subdomain: subdomain,
 			TTL:       1800,
 			Type:      "A",
-			IP:        newIp},
+			IP:        ip},
 	}}
 
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
@@ -68,16 +71,19 @@ func (s *integrationService) CreateRecord(domainName string, subdomainName strin
 	return response.Status
 }
 
-func (s *integrationService) UpdateRecord(domainName string, newIp string) string {
+func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+
+	rowID, _ := strconv.Atoi(s.GetRecord(domain, subdomain).RecordID)
+
 	request := &models.Request{Body: models.RequestBody{
 		Login:   s.config.WApiUsername,
 		Secret:  token,
 		Command: "dns-row-update",
 		Data: models.RequestData{
-			Domain: domainName,
-			RowID:  1724,
+			Domain: domain,
+			RowID:  rowID,
 			TTL:    1800,
 			Type:   "A",
 			IP:     newIp},
@@ -108,16 +114,19 @@ func (s *integrationService) UpdateRecord(domainName string, newIp string) strin
 	return response.Status
 }
 
-func (s *integrationService) DeleteRecord(domainName string) string {
+func (s *integrationService) DeleteRecord(domain string, subdomain string) string {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+
+	rowID, _ := strconv.Atoi(s.GetRecord(domain, subdomain).RecordID)
+
 	request := &models.Request{Body: models.RequestBody{
 		Login:   s.config.WApiUsername,
 		Secret:  token,
 		Command: "dns-row-delete",
 		Data: models.RequestData{
-			Domain: domainName,
-			RowID:  1724},
+			Domain: domain,
+			RowID:  rowID},
 	}}
 
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
@@ -145,7 +154,7 @@ func (s *integrationService) DeleteRecord(domainName string) string {
 	return response.Status
 }
 
-func (s *integrationService) GetInfo(domainName string) string {
+func (s *integrationService) GetInfo(domainName string) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -169,16 +178,34 @@ func (s *integrationService) GetInfo(domainName string) string {
 		}
 	}(response.Body)
 
+	var result models.WApiResponse
+
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(response.Body)
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		return string(bodyBytes)
+		err = json.Unmarshal(bodyBytes, &result)
+		if err != nil {
+			return models.WApiResponse{}
+		}
 	}
 
-	return response.Status
+	return result
+}
+
+func (s *integrationService) GetRecord(domain string, subdomain string) models.Record {
+	records := s.GetInfo(domain)
+	var record models.Record
+
+	for _, row := range records.Body.Data.Records {
+		if row.Subdomain == subdomain {
+			record = row
+		}
+	}
+
+	return record
 }
 
 func getApiToken(username string, password string) string {
