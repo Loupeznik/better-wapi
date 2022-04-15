@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/loupeznik/better-wapi/src/api"
 	"github.com/loupeznik/better-wapi/src/helpers"
+	"log"
 )
 
 func main() {
@@ -12,8 +13,8 @@ func main() {
 
 	api.SetupRoutes(config, router)
 
-	err := router.Run("localhost:8000")
+	err := router.Run("0.0.0.0:8000")
 	if err != nil {
-		return
+		log.Fatal("Could not start router")
 	}
 }

@@ -33,14 +33,45 @@ cp .env.example .env
 ```
 
 Fill the .env file with your credentials.
-- The wapi_ variables are your WAPI credentials from the WEDOS management dashboard
-- The user_ variables are credentials to use within your API
+- The BW_WAPI variables are your WAPI credentials from the WEDOS management dashboard
+- The BW_USER_ variables are credentials to use within your API
+
+Alternatively, it is possible to use environment variables without using the .env file. 
+
+Example in Powershell:
+
+```powershell
+$Env:BW_USER_LOGIN = "admin"
+$Env:BW_USER_SECRET = "admin"
+$Env:BW_WAPI_LOGIN = "admin@example.com"
+$Env:BW_WAPI_PASSWORD = "yourpassword"
+```
+
+Finally, to run the API.
 
 ```bash
 go run .
 ```
 
 For production workloads, a web server like NGINX is needed, the .env file also needs to be present.
+
+## Running in Docker
+
+An option to run the API in Docker is available as well.
+
+Building the image:
+
+```bash
+docker build -t better-wapi:latest .
+docker run -d -p 8083:8000 --env-file .\.env better-wapi:latest
+```
+
+Alternatively, get the image from Dockerhub
+
+```bash
+docker pull docker pull loupeznik/better-wapi
+docker run -d -p 8083:8000 --env-file .\.env better-wapi:latest
+```
 
 ## Documentation
 - WAPI documentation - https://kb.wedos.com/en/kategorie/wapi-api-interface/
@@ -64,7 +95,7 @@ curl --location --request PUT 'http://127.0.0.1:8000/api/domain/dzarsky.eu/recor
 }'
 ```
 
-The API uses basic auth with the user_ credentials set in the .env file.
+The API uses basic auth with the BW_USER credentials set in the .env file.
 
 ## License
 This project is [GPL-3.0 licensed](https://github.com/Loupeznik/better-wapi/blob/master/LICENSE).
