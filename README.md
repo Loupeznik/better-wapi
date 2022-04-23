@@ -1,10 +1,12 @@
 # Better WAPI
-This project is inteded to serve as a more standardized wrapper around the Wedos API (WAPI). 
+
+This project is inteded to serve as a more standardized wrapper around the Wedos API (WAPI).
 
 ![GitHub](https://img.shields.io/github/license/loupeznik/better-wapi?style=for-the-badge)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/loupeznik/better-wapi?style=for-the-badge)
 
 It currently offers following functionality:
+
 - Add DNS record for a specific domain
 - Update DNS record for specific domain
 - Remove DNS record for specific domain
@@ -20,11 +22,13 @@ This project is still in active development and far from final release. All feat
 (while trying to preserve backward compatibility of course).
 
 ## Installation
-For the API to work, it is first important to whitelist the IP address of the host machine in the 
+
+For the API to work, it is first important to whitelist the IP address of the host machine in the
 *[WEDOS management dashboard](https://client.wedos.com/client/wapi.html)*. It is best to have a server with a static
 IP address assigned and have this address whitelisted (for production environments).
 
 To run the project locally:
+
 ```bash
 git clone https://github.com/Loupeznik/better-wapi.git
 cd better-wapi
@@ -33,10 +37,11 @@ cp .env.example .env
 ```
 
 Fill the .env file with your credentials.
-- The BW_WAPI variables are your WAPI credentials from the WEDOS management dashboard
+
+- The BW_WAPI_ variables are your WAPI credentials from the WEDOS management dashboard
 - The BW_USER_ variables are credentials to use within your API
 
-Alternatively, it is possible to use environment variables without using the .env file. 
+Alternatively, it is possible to use environment variables without using the .env file.
 
 Example in Powershell:
 
@@ -70,21 +75,25 @@ Alternatively, get the image from Dockerhub
 
 ```bash
 docker pull docker pull loupeznik/better-wapi
-docker run -d -p 8083:8000 --env-file .\.env better-wapi:latest
+docker run -d -p 8083:8000 --env-file .\.env loupeznik/better-wapi:latest
 ```
 
 ## Documentation
-- WAPI documentation - https://kb.wedos.com/en/kategorie/wapi-api-interface/
+
+- WAPI documentation - <https://kb.wedos.com/en/kategorie/wapi-api-interface/>
 - Better WAPI documentation - Pending
 
 ## Example usage
 
 ### List all subdomains
+
 ```bash
 curl --location --request GET 'http://127.0.0.1:8000/api/domain/dzarsky.eu/info' \
 --header 'Authorization: Basic aGVsb3U6eWVz'
 ```
+
 ### Update a record
+
 ```bash
 curl --location --request PUT 'http://127.0.0.1:8000/api/domain/dzarsky.eu/record' \
 --header 'Authorization: Basic aGVsb3U6eWVz' \
@@ -98,6 +107,7 @@ curl --location --request PUT 'http://127.0.0.1:8000/api/domain/dzarsky.eu/recor
 The API uses basic auth with the BW_USER credentials set in the .env file.
 
 ## License
+
 This project is [GPL-3.0 licensed](https://github.com/Loupeznik/better-wapi/blob/master/LICENSE).
 
 Created by [Dominik Zarsky](https://github.com/Loupeznik).
