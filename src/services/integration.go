@@ -19,6 +19,7 @@ type IntegrationService interface {
 	DeleteRecord()
 	GetInfo()
 	GetRecord()
+	CommitChanges()
 }
 
 type integrationService struct {
@@ -206,6 +207,48 @@ func (s *integrationService) GetRecord(domain string, subdomain string) models.R
 	}
 
 	return record
+}
+
+func (s *integrationService) CommitChanges(domain string) models.WApiResponse {
+	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+
+	request := &models.Request{Body: models.RequestBody{
+		Login:   s.config.WApiUsername,
+		Secret:  token,
+		Command: "dns-domain-commit",
+		Data: models.RequestData{
+			Subdomain: domain},
+	}}
+
+	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
+
+	if err != nil {
+		panic(err)
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			panic(err)
+		}
+	}(response.Body)
+
+	var result models.WApiResponse
+
+	if response.StatusCode == http.StatusOK {
+		bodyBytes, err := io.ReadAll(response.Body)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		err = json.Unmarshal(bodyBytes, &result)
+		if err != nil {
+			return models.WApiResponse{}
+		}
+	}
+
+	return result
 }
 
 func getApiToken(username string, password string) string {

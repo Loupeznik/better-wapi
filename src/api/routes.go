@@ -84,5 +84,15 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 				"data": result,
 			})
 		})
+
+		api.POST("/domain/:domain/commit", func(c *gin.Context) {
+			domain := c.Param("domain")
+
+			result := integrationService.CommitChanges(domain)
+
+			c.JSON(http.StatusOK, gin.H{
+				"data": result,
+			})
+		})
 	}
 }
