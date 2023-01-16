@@ -74,7 +74,7 @@ docker run -d -p 8083:8000 --env-file .\.env better-wapi:latest
 Alternatively, get the image from Dockerhub
 
 ```bash
-docker pull docker pull loupeznik/better-wapi
+docker pull loupeznik/better-wapi
 docker run -d -p 8083:8000 --env-file .\.env loupeznik/better-wapi:latest
 ```
 
