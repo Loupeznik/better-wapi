@@ -1,12 +1,13 @@
 package api
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
 	"github.com/loupeznik/better-wapi/src/api/middleware"
 	requests "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/models"
 	"github.com/loupeznik/better-wapi/src/services"
-	"net/http"
 )
 
 func SetupRoutes(config *models.Config, router *gin.Engine) {
@@ -77,6 +78,12 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 		api.DELETE("/domain/:domain/record", func(c *gin.Context) {
 			domain := c.Param("domain")
 			var request requests.SaveRowRequest
+
+			err := c.ShouldBindJSON(&request)
+
+			if err != nil {
+				c.AbortWithStatus(http.StatusBadRequest)
+			}
 
 			result := integrationService.DeleteRecord(domain, request.Subdomain)
 
