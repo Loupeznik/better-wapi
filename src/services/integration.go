@@ -4,13 +4,14 @@ import (
 	"crypto/sha1"
 	"encoding/json"
 	"fmt"
-	"github.com/loupeznik/better-wapi/src/helpers"
-	"github.com/loupeznik/better-wapi/src/models"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/loupeznik/better-wapi/src/helpers"
+	"github.com/loupeznik/better-wapi/src/models"
 )
 
 type IntegrationService interface {
@@ -32,7 +33,7 @@ func NewIntegrationService(config *models.Config) *integrationService {
 	return &integrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *integrationService) CreateRecord(domain string, subdomain string, ip string) string {
+func (s *integrationService) CreateRecord(domain string, subdomain string, ip string) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -56,9 +57,11 @@ func (s *integrationService) CreateRecord(domain string, subdomain string, ip st
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-
+			panic(err)
 		}
 	}(response.Body)
+
+	var result models.WApiResponse
 
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(response.Body)
@@ -66,13 +69,16 @@ func (s *integrationService) CreateRecord(domain string, subdomain string, ip st
 			log.Fatal(err)
 		}
 
-		return string(bodyBytes)
+		err = json.Unmarshal(bodyBytes, &result)
+		if err != nil {
+			return models.WApiResponse{}
+		}
 	}
 
-	return response.Status
+	return result
 }
 
-func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp string) string {
+func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp string) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -99,9 +105,11 @@ func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-
+			panic(err)
 		}
 	}(response.Body)
+
+	var result models.WApiResponse
 
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(response.Body)
@@ -109,13 +117,16 @@ func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp
 			log.Fatal(err)
 		}
 
-		return string(bodyBytes)
+		err = json.Unmarshal(bodyBytes, &result)
+		if err != nil {
+			return models.WApiResponse{}
+		}
 	}
 
-	return response.Status
+	return result
 }
 
-func (s *integrationService) DeleteRecord(domain string, subdomain string) string {
+func (s *integrationService) DeleteRecord(domain string, subdomain string) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -139,9 +150,11 @@ func (s *integrationService) DeleteRecord(domain string, subdomain string) strin
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-
+			panic(err)
 		}
 	}(response.Body)
+
+	var result models.WApiResponse
 
 	if response.StatusCode == http.StatusOK {
 		bodyBytes, err := io.ReadAll(response.Body)
@@ -149,10 +162,13 @@ func (s *integrationService) DeleteRecord(domain string, subdomain string) strin
 			log.Fatal(err)
 		}
 
-		return string(bodyBytes)
+		err = json.Unmarshal(bodyBytes, &result)
+		if err != nil {
+			return models.WApiResponse{}
+		}
 	}
 
-	return response.Status
+	return result
 }
 
 func (s *integrationService) GetInfo(domainName string) models.WApiResponse {
@@ -175,7 +191,7 @@ func (s *integrationService) GetInfo(domainName string) models.WApiResponse {
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-
+			panic(err)
 		}
 	}(response.Body)
 
