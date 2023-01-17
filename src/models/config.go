@@ -5,4 +5,5 @@ type Config struct {
 	UserSecret   string
 	WApiUsername string
 	WApiPassword string
+	BaseUrl      string
 }

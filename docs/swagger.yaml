@@ -1,0 +1,264 @@
+basePath: /api
+definitions:
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  models.Record:
+    properties:
+      ID:
+        type: string
+      author_comment:
+        type: string
+      changed_date:
+        type: string
+      name:
+        type: string
+      rdata:
+        type: string
+      rdtype:
+        type: string
+      ttl:
+        type: string
+    type: object
+  models.ResponseBody:
+    properties:
+      code:
+        type: integer
+      command:
+        type: string
+      data:
+        $ref: '#/definitions/models.ResponseRow'
+      result:
+        type: string
+      svTRID:
+        type: string
+      timestamp:
+        type: integer
+    type: object
+  models.ResponseRow:
+    properties:
+      row:
+        items:
+          $ref: '#/definitions/models.Record'
+        type: array
+    type: object
+  models.SaveRowRequest:
+    properties:
+      autocommit:
+        default: false
+        type: boolean
+      ip:
+        type: string
+      subdomain:
+        type: string
+    required:
+    - subdomain
+    type: object
+  models.WApiResponse:
+    properties:
+      response:
+        $ref: '#/definitions/models.ResponseBody'
+    type: object
+host: http://localhost:8000
+info:
+  contact: {}
+  description: A wrapper around the Wedos API (WAPI)
+  license:
+    name: GNU General Public License v3.0
+    url: https://github.com/Loupeznik/better-wapi/blob/master/LICENSE
+  title: Better WAPI
+  version: "1.0"
+paths:
+  /domain/{domain}/{subdomain}/info:
+    get:
+      parameters:
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: Subdomain
+        in: path
+        name: subdomain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Get DNS record for a specific subdomain
+      tags:
+      - domain
+  /domain/{domain}/info:
+    get:
+      parameters:
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Get all DNS records for a domain
+      tags:
+      - domain
+  /domain/{domain}/record:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaveRowRequest'
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Delete an existing A record
+      tags:
+      - domain
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaveRowRequest'
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Create a new A record
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaveRowRequest'
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.WApiResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      security:
+      - BasicAuth: []
+      summary: Update an existing A record
+      tags:
+      - domain
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

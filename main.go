@@ -1,15 +1,33 @@
 package main
 
 import (
+	"log"
+
+	"github.com/loupeznik/better-wapi/docs"
+
 	"github.com/gin-gonic/gin"
 	"github.com/loupeznik/better-wapi/src/api"
 	"github.com/loupeznik/better-wapi/src/helpers"
-	"log"
 )
 
+// @title	Better WAPI
+// @version	1.0
+// @description	A wrapper around the Wedos API (WAPI)
+
+// @license.name	GNU General Public License v3.0
+// @license.url	https://github.com/Loupeznik/better-wapi/blob/master/LICENSE
+
+// @BasePath	/api
+// @host	http://localhost:8000
+
+// @securityDefinitions.basic	BasicAuth
 func main() {
 	router := gin.Default()
 	config := helpers.SetupIntegrationConfig()
+
+	if config.BaseUrl != "" {
+		docs.SwaggerInfo.Host = config.BaseUrl
+	}
 
 	api.SetupRoutes(config, router)
 

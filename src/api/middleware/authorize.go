@@ -2,10 +2,12 @@ package middleware
 
 import (
 	"encoding/base64"
+	"strings"
+
 	"github.com/gin-gonic/gin"
+	requests "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/models"
 	"github.com/loupeznik/better-wapi/src/services"
-	"strings"
 )
 
 func Authorize(config *models.Config) gin.HandlerFunc {
@@ -35,7 +37,9 @@ func Authorize(config *models.Config) gin.HandlerFunc {
 }
 
 func respondWithError(code int, message string, c *gin.Context) {
-	resp := map[string]string{"error": message}
+	resp := requests.ErrorResponse{
+		Error: message,
+	}
 
 	c.JSON(code, resp)
 	c.Abort()

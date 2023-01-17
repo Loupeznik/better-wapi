@@ -14,26 +14,17 @@ import (
 	"github.com/loupeznik/better-wapi/src/models"
 )
 
-type IntegrationService interface {
-	CreateRecord()
-	UpdateRecord()
-	DeleteRecord()
-	GetInfo()
-	GetRecord()
-	CommitChanges()
-}
-
-type integrationService struct {
+type IntegrationService struct {
 	config  *models.Config
 	baseUrl string
 }
 
-func NewIntegrationService(config *models.Config) *integrationService {
+func NewIntegrationService(config *models.Config) *IntegrationService {
 	wapiBaseUrl := "https://api.wedos.com/wapi/json"
-	return &integrationService{config: config, baseUrl: wapiBaseUrl}
+	return &IntegrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *integrationService) CreateRecord(domain string, subdomain string, ip string, commit bool) models.WApiResponse {
+func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip string, commit bool) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -82,7 +73,7 @@ func (s *integrationService) CreateRecord(domain string, subdomain string, ip st
 	return result
 }
 
-func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp string, commit bool) models.WApiResponse {
+func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp string, commit bool) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -134,7 +125,7 @@ func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp
 	return result
 }
 
-func (s *integrationService) DeleteRecord(domain string, subdomain string, commit bool) models.WApiResponse {
+func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commit bool) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -183,7 +174,7 @@ func (s *integrationService) DeleteRecord(domain string, subdomain string, commi
 	return result
 }
 
-func (s *integrationService) GetInfo(domainName string) models.WApiResponse {
+func (s *IntegrationService) GetInfo(domainName string) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -224,7 +215,7 @@ func (s *integrationService) GetInfo(domainName string) models.WApiResponse {
 	return result
 }
 
-func (s *integrationService) GetRecord(domain string, subdomain string) models.Record {
+func (s *IntegrationService) GetRecord(domain string, subdomain string) models.Record {
 	records := s.GetInfo(domain)
 	var record models.Record
 
@@ -237,7 +228,7 @@ func (s *integrationService) GetRecord(domain string, subdomain string) models.R
 	return record
 }
 
-func (s *integrationService) CommitChanges(domain string) models.WApiResponse {
+func (s *IntegrationService) CommitChanges(domain string) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
