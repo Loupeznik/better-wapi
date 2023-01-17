@@ -33,7 +33,7 @@ func NewIntegrationService(config *models.Config) *integrationService {
 	return &integrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *integrationService) CreateRecord(domain string, subdomain string, ip string) models.WApiResponse {
+func (s *integrationService) CreateRecord(domain string, subdomain string, ip string, commit bool) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -73,12 +73,16 @@ func (s *integrationService) CreateRecord(domain string, subdomain string, ip st
 		if err != nil {
 			return models.WApiResponse{}
 		}
+
+		if commit {
+			s.CommitChanges(domain)
+		}
 	}
 
 	return result
 }
 
-func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp string) models.WApiResponse {
+func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp string, commit bool) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -121,12 +125,16 @@ func (s *integrationService) UpdateRecord(domain string, subdomain string, newIp
 		if err != nil {
 			return models.WApiResponse{}
 		}
+
+		if commit {
+			s.CommitChanges(domain)
+		}
 	}
 
 	return result
 }
 
-func (s *integrationService) DeleteRecord(domain string, subdomain string) models.WApiResponse {
+func (s *integrationService) DeleteRecord(domain string, subdomain string, commit bool) models.WApiResponse {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -165,6 +173,10 @@ func (s *integrationService) DeleteRecord(domain string, subdomain string) model
 		err = json.Unmarshal(bodyBytes, &result)
 		if err != nil {
 			return models.WApiResponse{}
+		}
+
+		if commit {
+			s.CommitChanges(domain)
 		}
 	}
 
@@ -272,7 +284,7 @@ func getApiToken(username string, password string) string {
 	passwordHash.Write([]byte(password))
 	location, _ := time.LoadLocation("Europe/Prague")
 	hour := formatHour(time.Now().In(location).Hour())
-	log.Print(hour)
+
 	passwordHashString := fmt.Sprintf("%x", passwordHash.Sum(nil))
 
 	token := fmt.Sprintf("%s%s%s", username, passwordHashString, hour)

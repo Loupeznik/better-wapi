@@ -31,7 +31,7 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
-			updateResult := integrationService.UpdateRecord(domain, request.Subdomain, request.IP)
+			updateResult := integrationService.UpdateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
 
 			c.JSON(http.StatusOK, gin.H{
 				"data": updateResult,
@@ -68,7 +68,7 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
-			result := integrationService.CreateRecord(domain, request.Subdomain, request.IP)
+			result := integrationService.CreateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
 
 			c.JSON(http.StatusOK, gin.H{
 				"data": result,
@@ -85,7 +85,7 @@ func SetupRoutes(config *models.Config, router *gin.Engine) {
 				c.AbortWithStatus(http.StatusBadRequest)
 			}
 
-			result := integrationService.DeleteRecord(domain, request.Subdomain)
+			result := integrationService.DeleteRecord(domain, request.Subdomain, request.Autocommit)
 
 			c.JSON(http.StatusOK, gin.H{
 				"data": result,
