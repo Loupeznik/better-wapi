@@ -81,7 +81,7 @@ docker run -d -p 8083:8000 --env-file .\.env loupeznik/better-wapi:latest
 ## Documentation
 
 - WAPI documentation - <https://kb.wedos.com/en/kategorie/wapi-api-interface/>
-- Better WAPI documentation - Pending
+- Better WAPI documentation - [SwaggerHub](https://app.swaggerhub.com/apis/DZARSKY_1/better-wapi/1.0)
 
 ## Example usage
 
