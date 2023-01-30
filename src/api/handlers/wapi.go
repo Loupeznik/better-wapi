@@ -180,7 +180,6 @@ func GetSubdomainInfo(c *gin.Context) {
 	result, status, err := integrationService.GetRecord(domain, subdomain)
 
 	if status >= 400 {
-		print(status)
 		c.JSON(status, apiModels.ErrorResponse{
 			Error: err.Error(),
 		})
