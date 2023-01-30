@@ -24,10 +24,13 @@ func init() {
 // @Accept		json
 // @Param 		request	body	apiModels.SaveRowRequest	true	"Request body"
 // @Param		domain	path	string	true	"Domain"
-// @Success		200	{object}	models.WApiResponse
-// @Failure		400	{object}	models.WApiResponse
+// @Success		200
+// @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/record [post]
 // @Security	BasicAuth
 func CreateRecord(c *gin.Context) {
@@ -39,11 +42,16 @@ func CreateRecord(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 	}
 
-	result := integrationService.CreateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
+	status, err := integrationService.CreateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": result,
-	})
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(status)
 }
 
 // UpdateRecord	godoc
@@ -53,10 +61,13 @@ func CreateRecord(c *gin.Context) {
 // @Accept		json
 // @Param 		request	body	apiModels.SaveRowRequest	true	"Request body"
 // @Param		domain	path	string	true	"Domain"
-// @Success		200	{object}	models.WApiResponse
-// @Failure		400	{object}	models.WApiResponse
+// @Success		200
+// @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/record [put]
 // @Security	BasicAuth
 func UpdateRecord(c *gin.Context) {
@@ -68,11 +79,16 @@ func UpdateRecord(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 	}
 
-	updateResult := integrationService.UpdateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
+	status, err := integrationService.UpdateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": updateResult,
-	})
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(status)
 }
 
 // DeleteRecord	godoc
@@ -82,10 +98,13 @@ func UpdateRecord(c *gin.Context) {
 // @Accept		json
 // @Param 		request	body	apiModels.SaveRowRequest	true	"Request body"
 // @Param		domain	path	string	true	"Domain"
-// @Success		200	{object}	models.WApiResponse
-// @Failure		400	{object}	models.WApiResponse
+// @Success		200
+// @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/record [delete]
 // @Security	BasicAuth
 func DeleteRecord(c *gin.Context) {
@@ -98,11 +117,16 @@ func DeleteRecord(c *gin.Context) {
 		c.AbortWithStatus(http.StatusBadRequest)
 	}
 
-	result := integrationService.DeleteRecord(domain, request.Subdomain, request.Autocommit)
+	status, err := integrationService.DeleteRecord(domain, request.Subdomain, request.Autocommit)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": result,
-	})
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(status)
 }
 
 // GetDomainInfo	godoc
@@ -110,20 +134,28 @@ func DeleteRecord(c *gin.Context) {
 // @Tags		domain
 // @Produce		json
 // @Param		domain	path	string	true	"Domain"
-// @Success		200	{object}	models.WApiResponse
-// @Failure		400	{object}	models.WApiResponse
+// @Success		200	{object}	[]models.Record
+// @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/info [get]
 // @Security	BasicAuth
 func GetDomainInfo(c *gin.Context) {
 	domain := c.Param("domain")
 
-	getInfoResult := integrationService.GetInfo(domain)
+	result, status, err := integrationService.GetInfo(domain)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": getInfoResult,
-	})
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(status, result)
 }
 
 // GetSubdomainInfo	godoc
@@ -132,21 +164,30 @@ func GetDomainInfo(c *gin.Context) {
 // @Produce		json
 // @Param		domain	path	string	true	"Domain"
 // @Param		subdomain	path	string	true	"Subdomain"
-// @Success		200	{object}	models.WApiResponse
-// @Failure		400	{object}	models.WApiResponse
+// @Success		200 {object}	models.Record
+// @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/{subdomain}/info [get]
 // @Security	BasicAuth
 func GetSubdomainInfo(c *gin.Context) {
 	domain := c.Param("domain")
 	subdomain := c.Param("subdomain")
 
-	getRecordResult := integrationService.GetRecord(domain, subdomain)
+	result, status, err := integrationService.GetRecord(domain, subdomain)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": getRecordResult,
-	})
+	if status >= 400 {
+		print(status)
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(status, result)
 }
 
 // CommitChanges	godoc
@@ -155,17 +196,25 @@ func GetSubdomainInfo(c *gin.Context) {
 // @Produce		json
 // @Accept		json
 // @Param		domain	path	string	true	"Domain"
-// @Success		200	{object}	models.WApiResponse
-// @Failure		400	{object}	models.WApiResponse
+// @Success		200
+// @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
 // @Security	BasicAuth
 func CommitChanges(c *gin.Context) {
 	domain := c.Param("domain")
 
-	result := integrationService.CommitChanges(domain)
+	status, err := integrationService.CommitChanges(domain)
 
-	c.JSON(http.StatusOK, gin.H{
-		"data": result,
-	})
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(status)
 }

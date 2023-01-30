@@ -3,6 +3,7 @@ package services
 import (
 	"crypto/sha1"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -24,7 +25,7 @@ func NewIntegrationService(config *models.Config) *IntegrationService {
 	return &IntegrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip string, commit bool) models.WApiResponse {
+func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip string, commit bool) (int, error) {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -54,30 +55,35 @@ func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip st
 
 	var result models.WApiResponse
 
-	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = json.Unmarshal(bodyBytes, &result)
-		if err != nil {
-			return models.WApiResponse{}
-		}
-
-		if commit {
-			s.CommitChanges(domain)
-		}
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return result
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return 500, err
+	}
+
+	if commit {
+		s.CommitChanges(domain)
+	}
+
+	status, err := helpers.ResolveStatusCode(result.Body.StatusCode)
+
+	if err == nil && status >= 400 {
+		err = errors.New(result.Body.ResultStatus)
+	}
+
+	return status, err
 }
 
-func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp string, commit bool) models.WApiResponse {
+func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp string, commit bool) (int, error) {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
-	rowID, _ := strconv.Atoi(s.GetRecord(domain, subdomain).RecordID)
+	record, _, _ := s.GetRecord(domain, subdomain)
+	rowID, _ := strconv.Atoi(record.RecordID)
 
 	request := &models.Request{Body: models.RequestBody{
 		Login:   s.config.WApiUsername,
@@ -106,30 +112,35 @@ func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp
 
 	var result models.WApiResponse
 
-	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = json.Unmarshal(bodyBytes, &result)
-		if err != nil {
-			return models.WApiResponse{}
-		}
-
-		if commit {
-			s.CommitChanges(domain)
-		}
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return 500, err
 	}
 
-	return result
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return 500, err
+	}
+
+	if commit {
+		s.CommitChanges(domain)
+	}
+
+	status, err := helpers.ResolveStatusCode(result.Body.StatusCode)
+
+	if err == nil && status >= 400 {
+		err = errors.New(result.Body.ResultStatus)
+	}
+
+	return status, err
 }
 
-func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commit bool) models.WApiResponse {
+func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commit bool) (int, error) {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
-	rowID, _ := strconv.Atoi(s.GetRecord(domain, subdomain).RecordID)
+	record, _, _ := s.GetRecord(domain, subdomain)
+	rowID, _ := strconv.Atoi(record.RecordID)
 
 	request := &models.Request{Body: models.RequestBody{
 		Login:   s.config.WApiUsername,
@@ -155,26 +166,30 @@ func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commi
 
 	var result models.WApiResponse
 
-	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = json.Unmarshal(bodyBytes, &result)
-		if err != nil {
-			return models.WApiResponse{}
-		}
-
-		if commit {
-			s.CommitChanges(domain)
-		}
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return result
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return 500, err
+	}
+
+	if commit {
+		s.CommitChanges(domain)
+	}
+
+	status, err := helpers.ResolveStatusCode(result.Body.StatusCode)
+
+	if err == nil && status >= 400 {
+		err = errors.New(result.Body.ResultStatus)
+	}
+
+	return status, err
 }
 
-func (s *IntegrationService) GetInfo(domainName string) models.WApiResponse {
+func (s *IntegrationService) GetInfo(domainName string) ([]models.Record, int, error) {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 	request := &models.Request{Body: models.RequestBody{
@@ -200,35 +215,47 @@ func (s *IntegrationService) GetInfo(domainName string) models.WApiResponse {
 
 	var result models.WApiResponse
 
-	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = json.Unmarshal(bodyBytes, &result)
-		if err != nil {
-			return models.WApiResponse{}
-		}
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return result
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return nil, 500, err
+	}
+
+	status, err := helpers.ResolveStatusCode(result.Body.StatusCode)
+
+	if err == nil && status >= 400 {
+		err = errors.New(result.Body.ResultStatus)
+	}
+
+	return result.Body.Data.Records, status, err
 }
 
-func (s *IntegrationService) GetRecord(domain string, subdomain string) models.Record {
-	records := s.GetInfo(domain)
+func (s *IntegrationService) GetRecord(domain string, subdomain string) (models.Record, int, error) {
+	records, status, err := s.GetInfo(domain)
 	var record models.Record
 
-	for _, row := range records.Body.Data.Records {
+	if err != nil {
+		return record, status, err
+	}
+
+	for _, row := range records {
 		if row.Subdomain == subdomain {
 			record = row
 		}
 	}
 
-	return record
+	if record.IP == "" {
+		return record, 404, errors.New("not found")
+	}
+
+	return record, status, nil
 }
 
-func (s *IntegrationService) CommitChanges(domain string) models.WApiResponse {
+func (s *IntegrationService) CommitChanges(domain string) (int, error) {
 	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
@@ -255,19 +282,23 @@ func (s *IntegrationService) CommitChanges(domain string) models.WApiResponse {
 
 	var result models.WApiResponse
 
-	if response.StatusCode == http.StatusOK {
-		bodyBytes, err := io.ReadAll(response.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		err = json.Unmarshal(bodyBytes, &result)
-		if err != nil {
-			return models.WApiResponse{}
-		}
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		log.Fatal(err)
 	}
 
-	return result
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return 500, err
+	}
+
+	status, err := helpers.ResolveStatusCode(result.Body.StatusCode)
+
+	if err == nil && status >= 400 {
+		err = errors.New(result.Body.ResultStatus)
+	}
+
+	return status, err
 }
 
 func getApiToken(username string, password string) string {

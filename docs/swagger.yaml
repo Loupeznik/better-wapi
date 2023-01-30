@@ -22,28 +22,6 @@ definitions:
       ttl:
         type: string
     type: object
-  models.ResponseBody:
-    properties:
-      code:
-        type: integer
-      command:
-        type: string
-      data:
-        $ref: '#/definitions/models.ResponseRow'
-      result:
-        type: string
-      svTRID:
-        type: string
-      timestamp:
-        type: integer
-    type: object
-  models.ResponseRow:
-    properties:
-      row:
-        items:
-          $ref: '#/definitions/models.Record'
-        type: array
-    type: object
   models.SaveRowRequest:
     properties:
       autocommit:
@@ -55,11 +33,6 @@ definitions:
         type: string
     required:
     - subdomain
-    type: object
-  models.WApiResponse:
-    properties:
-      response:
-        $ref: '#/definitions/models.ResponseBody'
     type: object
 host: http://localhost:8000
 info:
@@ -90,17 +63,29 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            $ref: '#/definitions/models.Record'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       security:
@@ -122,17 +107,31 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            items:
+              $ref: '#/definitions/models.Record'
+            type: array
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       security:
@@ -161,18 +160,28 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/models.WApiResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       security:
@@ -200,18 +209,28 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/models.WApiResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       security:
@@ -239,18 +258,28 @@ paths:
       responses:
         "200":
           description: OK
-          schema:
-            $ref: '#/definitions/models.WApiResponse'
         "400":
           description: Bad Request
           schema:
-            $ref: '#/definitions/models.WApiResponse'
+            $ref: '#/definitions/models.ErrorResponse'
         "401":
           description: Unauthorized
           schema:
             $ref: '#/definitions/models.ErrorResponse'
         "404":
           description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
       security:
