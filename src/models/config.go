@@ -6,4 +6,5 @@ type Config struct {
 	WApiUsername string
 	WApiPassword string
 	BaseUrl      string
+	UseLogFile   bool
 }

@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strconv"
 	"time"
@@ -43,13 +42,13 @@ func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip st
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
 
 	if err != nil {
-		panic(err)
+		helpers.Log("error", fmt.Sprintf("Request to WAPI failed: %s", err.Error()))
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			panic(err)
+			helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
 		}
 	}(response.Body)
 
@@ -57,7 +56,8 @@ func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip st
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
+		return 500, err
 	}
 
 	err = json.Unmarshal(bodyBytes, &result)
@@ -100,13 +100,13 @@ func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
 
 	if err != nil {
-		panic(err)
+		helpers.Log("error", fmt.Sprintf("Request to WAPI failed: %s", err.Error()))
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			panic(err)
+			helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
 		}
 	}(response.Body)
 
@@ -114,6 +114,7 @@ func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
+		helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
 		return 500, err
 	}
 
@@ -154,13 +155,13 @@ func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commi
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
 
 	if err != nil {
-		panic(err)
+		helpers.Log("error", fmt.Sprintf("Request to WAPI failed: %s", err.Error()))
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			panic(err)
+			helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
 		}
 	}(response.Body)
 
@@ -168,7 +169,8 @@ func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commi
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
+		return 500, err
 	}
 
 	err = json.Unmarshal(bodyBytes, &result)
@@ -203,7 +205,7 @@ func (s *IntegrationService) GetInfo(domainName string) ([]models.Record, int, e
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
 
 	if err != nil {
-		panic(err)
+		helpers.Log("error", fmt.Sprintf("Request to WAPI failed: %s", err.Error()))
 	}
 
 	defer func(Body io.ReadCloser) {
@@ -217,7 +219,8 @@ func (s *IntegrationService) GetInfo(domainName string) ([]models.Record, int, e
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
+		return nil, 500, err
 	}
 
 	err = json.Unmarshal(bodyBytes, &result)
@@ -270,13 +273,13 @@ func (s *IntegrationService) CommitChanges(domain string) (int, error) {
 	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
 
 	if err != nil {
-		panic(err)
+		helpers.Log("error", fmt.Sprintf("Request to WAPI failed: %s", err.Error()))
 	}
 
 	defer func(Body io.ReadCloser) {
 		err := Body.Close()
 		if err != nil {
-			panic(err)
+			helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
 		}
 	}(response.Body)
 
@@ -284,7 +287,8 @@ func (s *IntegrationService) CommitChanges(domain string) (int, error) {
 
 	bodyBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
+		return 500, err
 	}
 
 	err = json.Unmarshal(bodyBytes, &result)
