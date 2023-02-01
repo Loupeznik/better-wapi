@@ -1,6 +1,9 @@
 package helpers
 
 import (
+	"errors"
+	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -17,19 +20,30 @@ func init() {
 
 func Log(logLevel string, message string) {
 	if logToFile {
-		file := openOrCreateLogFile()
-		log.SetOutput(file)
+		file := *openOrCreateLogFile()
+		defer file.Close()
+
+		wrt := io.MultiWriter(os.Stdout, &file)
+		log.SetOutput(wrt)
 	}
 
 	log.Printf("[%s] %s", logLevel, message)
 }
 
 func openOrCreateLogFile() *os.File {
-	file, err := os.OpenFile("logs/api.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	dir := "logs"
+
+	if _, err := os.Stat(dir); errors.Is(err, os.ErrNotExist) {
+		err := os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			log.Fatalf("error creating log directory: %v", err)
+		}
+	}
+
+	file, err := os.OpenFile(fmt.Sprintf("%s/api.log", dir), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0644)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
-	defer file.Close()
 
 	return file
 }

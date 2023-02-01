@@ -21,3 +21,4 @@ go.work
 # Custom
 .env
 .idea
+logs
