@@ -62,6 +62,10 @@ For production workloads, a web server like NGINX is needed, the .env file also 
 
 ## Running in Docker
 
+[![Docker Image Version (latest by date)](https://img.shields.io/docker/v/loupeznik/better-wapi?style=for-the-badge)](https://hub.docker.com/repository/docker/loupeznik/better-wapi)
+![Docker Image Size (latest semver)](https://img.shields.io/docker/image-size/loupeznik/better-wapi?style=for-the-badge)
+![Docker Pulls](https://img.shields.io/docker/pulls/loupeznik/better-wapi?style=for-the-badge)
+
 An option to run the API in Docker is available as well.
 
 Building the image:
