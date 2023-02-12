@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	"github.com/gin-contrib/cors"
 	"github.com/loupeznik/better-wapi/docs"
 
 	"github.com/gin-gonic/gin"
@@ -28,6 +29,14 @@ func main() {
 	if config.BaseUrl != "" {
 		docs.SwaggerInfo.Host = config.BaseUrl
 	}
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowCredentials = true
+	corsConfig.AllowHeaders = []string{"*"}
+	corsConfig.AddAllowMethods("OPTIONS")
+
+	router.Use(cors.New(corsConfig))
 
 	api.SetupRoutes(config, router)
 
