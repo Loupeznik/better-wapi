@@ -6,13 +6,20 @@ import (
 
 	"github.com/gin-gonic/gin"
 	requests "github.com/loupeznik/better-wapi/src/api/models"
+	"github.com/loupeznik/better-wapi/src/helpers"
 	"github.com/loupeznik/better-wapi/src/models"
 	"github.com/loupeznik/better-wapi/src/services"
 )
 
-func Authorize(config *models.Config) gin.HandlerFunc {
-	authService := services.NewAuthService(config)
+var authService *services.AuthService
 
+func init() {
+	config := helpers.SetupIntegrationConfig()
+	authService = services.NewAuthService(config)
+}
+
+// Deprecated
+func AuthorizeBasic(config *models.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := strings.SplitN(c.Request.Header.Get("Authorization"), " ", 2)
 		if len(auth) != 2 || auth[0] != "Basic" {
@@ -28,6 +35,24 @@ func Authorize(config *models.Config) gin.HandlerFunc {
 		})
 
 		if len(pair) != 2 || !isAuthenticated {
+			respondWithError(401, "Unauthorized", c)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func Authorize() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		auth := strings.SplitN(c.Request.Header.Get("Authorization"), " ", 2)
+		if len(auth) != 2 || auth[0] != "Bearer" {
+			respondWithError(401, "Unauthorized", c)
+			return
+		}
+
+		_, err := authService.ValidateToken(auth[1])
+		if err != nil {
 			respondWithError(401, "Unauthorized", c)
 			return
 		}

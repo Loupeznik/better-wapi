@@ -5,6 +5,13 @@ definitions:
       error:
         type: string
     type: object
+  models.Login:
+    properties:
+      login:
+        type: string
+      secret:
+        type: string
+    type: object
   models.Record:
     properties:
       ID:
@@ -33,6 +40,11 @@ definitions:
         type: string
     required:
     - subdomain
+    type: object
+  models.TokenResponse:
+    properties:
+      token:
+        type: string
     type: object
 host: http://localhost:8000
 info:
@@ -88,8 +100,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Get DNS record for a specific subdomain
       tags:
       - domain
@@ -134,8 +144,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Get all DNS records for a domain
       tags:
       - domain
@@ -184,8 +192,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Delete an existing A record
       tags:
       - domain
@@ -233,8 +239,6 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Create a new A record
       tags:
       - domain
@@ -282,12 +286,36 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      security:
-      - BasicAuth: []
       summary: Update an existing A record
       tags:
       - domain
-securityDefinitions:
-  BasicAuth:
-    type: basic
+  /token:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.TokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get token
+      tags:
+      - auth
 swagger: "2.0"

@@ -20,8 +20,6 @@ import (
 
 // @BasePath	/api
 // @host	http://localhost:8000
-
-// @securityDefinitions.basic	BasicAuth
 func main() {
 	router := gin.Default()
 	config := helpers.SetupIntegrationConfig()
@@ -38,7 +36,7 @@ func main() {
 
 	router.Use(cors.New(corsConfig))
 
-	api.SetupRoutes(config, router)
+	api.SetupRoutes(router)
 
 	err := router.Run("0.0.0.0:8000")
 	if err != nil {

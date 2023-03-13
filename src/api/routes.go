@@ -4,20 +4,21 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/loupeznik/better-wapi/src/api/handlers"
 	"github.com/loupeznik/better-wapi/src/api/middleware"
-	"github.com/loupeznik/better-wapi/src/models"
 
 	swaggerFiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-func SetupRoutes(config *models.Config, router *gin.Engine) {
+func SetupRoutes(router *gin.Engine) {
 	router.GET("/docs/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	router.GET("/", func(c *gin.Context) {
 		c.Redirect(301, "/docs/index.html")
 	})
 
-	api := router.Group("/api", middleware.Authorize(config))
+	router.POST("/token", handlers.GetToken)
+
+	api := router.Group("/api", middleware.Authorize())
 	{
 		api.POST("/domain/:domain/record", handlers.CreateRecord)
 		api.PUT("/domain/:domain/record", handlers.UpdateRecord)
