@@ -34,7 +34,7 @@ func (s *AuthService) IssueToken(credentials models.Login) (string, error) {
 	claims := &authCustomClaims{
 		credentials.Login,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 1).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 12).Unix(),
 		},
 	}
 
