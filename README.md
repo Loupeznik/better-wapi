@@ -40,6 +40,7 @@ Fill the .env file with your credentials.
 
 - The BW_WAPI_ variables are your WAPI credentials from the WEDOS management dashboard
 - The BW_USER_ variables are credentials to use within your API
+- The BW_JSON_WEB_KEY is a key used for JWT signing (always fill this to secure your API)
 
 Alternatively, it is possible to use environment variables without using the .env file.
 
@@ -50,6 +51,7 @@ $Env:BW_USER_LOGIN = "admin"
 $Env:BW_USER_SECRET = "admin"
 $Env:BW_WAPI_LOGIN = "admin@example.com"
 $Env:BW_WAPI_PASSWORD = "yourpassword"
+$Env:BW_JSON_WEB_KEY = "yourkey"
 ```
 
 Finally, to run the API.
@@ -89,26 +91,37 @@ docker run -d -p 8083:8000 --env-file .\.env loupeznik/better-wapi:latest
 
 ## Example usage
 
+The API uses JWT auth with the BW_USER credentials set in the .env file.
+
+### Get the access token
+
+```bash
+curl --location --request GET 'http://127.0.0.1:8000/token' \
+--header 'Content-Type: application/json' \
+--data '{
+    "login": "BW_USER_LOGIN",
+    "secret": "BW_USER_SECRET"
+}'
+```
+
 ### List all subdomains
 
 ```bash
-curl --location --request GET 'http://127.0.0.1:8000/api/domain/dzarsky.eu/info' \
---header 'Authorization: Basic aGVsb3U6eWVz'
+curl --location --request GET 'http://127.0.0.1:8000/api/domain/yourdomain.xyz/info' \
+--header 'Authorization: Bearer <token>'
 ```
 
 ### Update a record
 
 ```bash
-curl --location --request PUT 'http://127.0.0.1:8000/api/domain/dzarsky.eu/record' \
---header 'Authorization: Basic aGVsb3U6eWVz' \
+curl --location --request PUT 'http://127.0.0.1:8000/api/domain/yourdomain.xyz/record' \
+--header 'Authorization: Bearer <token>' \
 --header 'Content-Type: application/json' \
 --data-raw '{
     "subdomain": "*",
     "ip": "123.123.123.123"
 }'
 ```
-
-The API uses basic auth with the BW_USER credentials set in the .env file.
 
 ## License
 
