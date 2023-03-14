@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	apiModels "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/helpers"
-	_ "github.com/loupeznik/better-wapi/src/models"
+
 	"github.com/loupeznik/better-wapi/src/services"
 )
 
@@ -32,7 +32,6 @@ func init() {
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/record [post]
-// @Security	BasicAuth
 func CreateRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.SaveRowRequest
@@ -69,7 +68,6 @@ func CreateRecord(c *gin.Context) {
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/record [put]
-// @Security	BasicAuth
 func UpdateRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.SaveRowRequest
@@ -106,7 +104,6 @@ func UpdateRecord(c *gin.Context) {
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/record [delete]
-// @Security	BasicAuth
 func DeleteRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.SaveRowRequest
@@ -142,7 +139,6 @@ func DeleteRecord(c *gin.Context) {
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/info [get]
-// @Security	BasicAuth
 func GetDomainInfo(c *gin.Context) {
 	domain := c.Param("domain")
 
@@ -172,7 +168,6 @@ func GetDomainInfo(c *gin.Context) {
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
 // @Router		/domain/{domain}/{subdomain}/info [get]
-// @Security	BasicAuth
 func GetSubdomainInfo(c *gin.Context) {
 	domain := c.Param("domain")
 	subdomain := c.Param("subdomain")
@@ -202,7 +197,6 @@ func GetSubdomainInfo(c *gin.Context) {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
-// @Security	BasicAuth
 func CommitChanges(c *gin.Context) {
 	domain := c.Param("domain")
 

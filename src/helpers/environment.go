@@ -24,6 +24,7 @@ func SetupIntegrationConfig() *models.Config {
 		WApiPassword: os.Getenv("BW_WAPI_PASSWORD"),
 		BaseUrl:      os.Getenv("BW_BASE_URL"),
 		UseLogFile:   useLogFile,
+		JsonWebKey:   os.Getenv("BW_JSON_WEB_KEY"),
 	}
 
 	return &config

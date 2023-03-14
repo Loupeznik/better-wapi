@@ -7,4 +7,5 @@ type Config struct {
 	WApiPassword string
 	BaseUrl      string
 	UseLogFile   bool
+	JsonWebKey   string
 }
