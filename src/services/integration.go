@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	apiModels "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/helpers"
 	"github.com/loupeznik/better-wapi/src/models"
 )
@@ -24,33 +25,33 @@ func NewIntegrationService(config *models.Config) *IntegrationService {
 	return &IntegrationService{config: config, baseUrl: wapiBaseUrl}
 }
 
-func (s *IntegrationService) CreateRecord(domain string, subdomain string, ip string, commit bool) (int, error) {
+func (s *IntegrationService) CreateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
 	data := models.RequestData{
 		Domain:    domain,
-		Subdomain: subdomain,
-		TTL:       1800,
-		Type:      "A",
-		IP:        ip,
+		Subdomain: request.Subdomain,
+		TTL:       *request.TTL,
+		Type:      string(*request.Type),
+		IP:        request.Data,
 	}
 
-	status, _, err := s.makeRequest("dns-row-add", data, commit)
+	status, _, err := s.makeRequest("dns-row-add", data, *request.Autocommit)
 
 	return status, err
 }
 
-func (s *IntegrationService) UpdateRecord(domain string, subdomain string, newIp string, commit bool) (int, error) {
-	record, _, _ := s.GetRecord(domain, subdomain)
+func (s *IntegrationService) UpdateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
+	record, _, _ := s.GetRecord(domain, request.Subdomain)
 	rowID, _ := strconv.Atoi(record.RecordID)
 
 	data := models.RequestData{
 		Domain: domain,
 		RowID:  rowID,
-		TTL:    1800,
-		Type:   "A",
-		IP:     newIp,
+		TTL:    *request.TTL,
+		Type:   string(*request.Type),
+		IP:     request.Data,
 	}
 
-	status, _, err := s.makeRequest("dns-row-update", data, commit)
+	status, _, err := s.makeRequest("dns-row-update", data, *request.Autocommit)
 
 	return status, err
 }

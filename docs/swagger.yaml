@@ -29,16 +29,50 @@ definitions:
       ttl:
         type: string
     type: object
+  models.RecordType:
+    enum:
+    - A
+    - CNAME
+    - MX
+    - TXT
+    - NS
+    - SRV
+    - AAAA
+    - CAA
+    - NAPTR
+    - TLSA
+    - SSHFP
+    type: string
+    x-enum-varnames:
+    - A
+    - CNAME
+    - MX
+    - TXT
+    - NS
+    - SRV
+    - AAAA
+    - CAA
+    - NAPTR
+    - TLSA
+    - SSHFP
   models.SaveRowRequest:
     properties:
       autocommit:
         default: false
         type: boolean
-      ip:
+      data:
         type: string
       subdomain:
         type: string
+      ttl:
+        default: 3600
+        type: integer
+      type:
+        allOf:
+        - $ref: '#/definitions/models.RecordType'
+        default: A
     required:
+    - data
     - subdomain
     type: object
   models.TokenResponse:

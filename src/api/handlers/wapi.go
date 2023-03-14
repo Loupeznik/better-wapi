@@ -7,6 +7,7 @@ import (
 	apiModels "github.com/loupeznik/better-wapi/src/api/models"
 	"github.com/loupeznik/better-wapi/src/helpers"
 
+	"github.com/creasty/defaults"
 	"github.com/loupeznik/better-wapi/src/services"
 )
 
@@ -35,13 +36,17 @@ func init() {
 func CreateRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.SaveRowRequest
-	err := c.ShouldBindJSON(&request)
+	err := c.BindJSON(&request)
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		returnValidationError(c, http.StatusBadRequest, nil)
 	}
 
-	status, err := integrationService.CreateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
+	if err := defaults.Set(&request); err != nil {
+		returnValidationError(c, http.StatusInternalServerError, err)
+	}
+
+	status, err := integrationService.CreateRecord(domain, request)
 
 	if err != nil {
 		c.JSON(status, apiModels.ErrorResponse{
@@ -74,10 +79,14 @@ func UpdateRecord(c *gin.Context) {
 	err := c.ShouldBindJSON(&request)
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		returnValidationError(c, http.StatusBadRequest, nil)
 	}
 
-	status, err := integrationService.UpdateRecord(domain, request.Subdomain, request.IP, request.Autocommit)
+	if err := defaults.Set(&request); err != nil {
+		returnValidationError(c, http.StatusInternalServerError, err)
+	}
+
+	status, err := integrationService.UpdateRecord(domain, request)
 
 	if err != nil {
 		c.JSON(status, apiModels.ErrorResponse{
@@ -111,10 +120,10 @@ func DeleteRecord(c *gin.Context) {
 	err := c.ShouldBindJSON(&request)
 
 	if err != nil {
-		c.AbortWithStatus(http.StatusBadRequest)
+		returnValidationError(c, http.StatusBadRequest, nil)
 	}
 
-	status, err := integrationService.DeleteRecord(domain, request.Subdomain, request.Autocommit)
+	status, err := integrationService.DeleteRecord(domain, request.Subdomain, *request.Autocommit)
 
 	if err != nil {
 		c.JSON(status, apiModels.ErrorResponse{
@@ -210,4 +219,16 @@ func CommitChanges(c *gin.Context) {
 	}
 
 	c.Status(status)
+}
+
+func returnValidationError(c *gin.Context, status int, err error) {
+	c.Header("Content-Type", "application/problem+json")
+
+	if err != nil {
+		c.AbortWithStatusJSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+	}
+
+	c.AbortWithStatus(status)
 }

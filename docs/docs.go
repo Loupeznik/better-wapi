@@ -465,9 +465,39 @@ const docTemplate = `{
                 }
             }
         },
+        "models.RecordType": {
+            "type": "string",
+            "enum": [
+                "A",
+                "CNAME",
+                "MX",
+                "TXT",
+                "NS",
+                "SRV",
+                "AAAA",
+                "CAA",
+                "NAPTR",
+                "TLSA",
+                "SSHFP"
+            ],
+            "x-enum-varnames": [
+                "A",
+                "CNAME",
+                "MX",
+                "TXT",
+                "NS",
+                "SRV",
+                "AAAA",
+                "CAA",
+                "NAPTR",
+                "TLSA",
+                "SSHFP"
+            ]
+        },
         "models.SaveRowRequest": {
             "type": "object",
             "required": [
+                "data",
                 "subdomain"
             ],
             "properties": {
@@ -475,11 +505,23 @@ const docTemplate = `{
                     "type": "boolean",
                     "default": false
                 },
-                "ip": {
+                "data": {
                     "type": "string"
                 },
                 "subdomain": {
                     "type": "string"
+                },
+                "ttl": {
+                    "type": "integer",
+                    "default": 3600
+                },
+                "type": {
+                    "default": "A",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.RecordType"
+                        }
+                    ]
                 }
             }
         },
