@@ -12,14 +12,12 @@ It currently offers following functionality:
 - Remove DNS record for specific domain
 - List all DNS records for specific domain
 - List a particular DNS record for specific domain
+- Commit changes to DNS records for specific domain
 
 The *BetterWAPI* project uses RESTful API style and tries to take a more standardized approach,
 something that the original WAPI is missing entirely. The core functionality remains similar.
 
-For creating and updating records, only operations on **A** record types are currently supported.
-
-This project is still in active development and far from final release. All features are subject to change
-(while trying to preserve backward compatibility of course).
+The API now supports all record types supported by WEDOS.
 
 ## Installation
 
@@ -111,6 +109,36 @@ curl --location --request GET 'http://127.0.0.1:8000/api/domain/yourdomain.xyz/i
 --header 'Authorization: Bearer <token>'
 ```
 
+### Create a record
+
+In the following case, an *A* record would be created with the default TTL of *3600*
+and the other data specified in the request, it will not be automatically commited.
+
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/domain/yourdomain.xyz/record' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "subdomain": "*",
+    "data": "123.123.123.123"
+}'
+```
+
+The following is the complete request with all possible parameters.
+
+```bash
+curl --location --request POST 'http://127.0.0.1:8000/api/domain/yourdomain.xyz/record' \
+--header 'Authorization: Bearer <token>' \
+--header 'Content-Type: application/json' \
+--data-raw '{
+    "subdomain": "exampletextrecord",
+    "data": "TEXT",
+    "ttl": 3600,
+    "type": "TXT",
+    "autocommit": true
+}'
+```
+
 ### Update a record
 
 ```bash
@@ -119,7 +147,7 @@ curl --location --request PUT 'http://127.0.0.1:8000/api/domain/yourdomain.xyz/r
 --header 'Content-Type: application/json' \
 --data-raw '{
     "subdomain": "*",
-    "ip": "123.123.123.123"
+    "data": "123.123.123.123"
 }'
 ```
 
