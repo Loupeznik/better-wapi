@@ -16,15 +16,23 @@ func SetupRoutes(router *gin.Engine) {
 		c.Redirect(301, "/docs/index.html")
 	})
 
-	router.POST("/token", handlers.GetToken)
+	router.POST("/token", func(c *gin.Context) {
+		c.Request.URL.Path = "/api/auth/token"
+		router.HandleContext(c)
+	})
 
-	api := router.Group("/api", middleware.Authorize())
+	api := router.Group("/api")
 	{
-		api.POST("/domain/:domain/record", handlers.CreateRecord)
-		api.PUT("/domain/:domain/record", handlers.UpdateRecord)
-		api.GET("/domain/:domain/info", handlers.GetDomainInfo)
-		api.GET("/domain/:domain/:subdomain/info", handlers.GetSubdomainInfo)
-		api.DELETE("/domain/:domain/record", handlers.DeleteRecord)
-		api.POST("/domain/:domain/commit", handlers.CommitChanges)
+		domain := api.Group("/domain/:domain", middleware.Authorize())
+		{
+			domain.POST("/record", handlers.CreateRecord)
+			domain.PUT("/record", handlers.UpdateRecord)
+			domain.GET("/info", handlers.GetDomainInfo)
+			domain.GET("/:subdomain/info", handlers.GetSubdomainInfo)
+			domain.DELETE("/record", handlers.DeleteRecord)
+			domain.POST("commit", handlers.CommitChanges)
+		}
+
+		api.POST("/auth/token", handlers.GetToken)
 	}
 }
