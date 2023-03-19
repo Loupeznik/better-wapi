@@ -73,7 +73,7 @@ jobs:
       uses: docker/build-push-action@v4.0.0
       with:
         context: .
-        platforms: linux/amd64,linux/arm64
+        platforms: linux/amd64,linux/arm64,linux/arm/v7
         push: true
         tags: |
           loupeznik/better-wapi:${{ github.ref_name }}
