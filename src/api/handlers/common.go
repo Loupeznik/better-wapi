@@ -26,7 +26,7 @@ func init() {
 // @Success		200	{object}	models.TokenResponse
 // @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
-// @Router		/token [post]
+// @Router		/auth/token [post]
 func GetToken(c *gin.Context) {
 	var request models.Login
 	err := c.ShouldBindJSON(&request)
