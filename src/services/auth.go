@@ -38,8 +38,6 @@ func (s *AuthService) IssueToken(credentials models.Login) (string, error) {
 		},
 	}
 
-	fmt.Println(s.config.JsonWebKey)
-
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	result, err := token.SignedString([]byte(s.config.JsonWebKey))
 
