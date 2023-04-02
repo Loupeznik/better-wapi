@@ -41,6 +41,11 @@ func (s *IntegrationService) CreateRecord(domain string, request apiModels.SaveR
 
 func (s *IntegrationService) UpdateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
 	record, _, _ := s.GetRecord(domain, request.Subdomain)
+
+	if record.RecordID == "" {
+		return 404, errors.New("not found")
+	}
+
 	rowID, _ := strconv.Atoi(record.RecordID)
 
 	data := models.RequestData{
@@ -58,6 +63,11 @@ func (s *IntegrationService) UpdateRecord(domain string, request apiModels.SaveR
 
 func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commit bool) (int, error) {
 	record, _, _ := s.GetRecord(domain, subdomain)
+
+	if record.RecordID == "" {
+		return 404, errors.New("not found")
+	}
+
 	rowID, _ := strconv.Atoi(record.RecordID)
 
 	data := models.RequestData{

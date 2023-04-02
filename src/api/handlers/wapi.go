@@ -40,10 +40,12 @@ func CreateRecord(c *gin.Context) {
 
 	if err != nil {
 		returnValidationError(c, http.StatusBadRequest, nil)
+		return
 	}
 
 	if err := defaults.Set(&request); err != nil {
 		returnValidationError(c, http.StatusInternalServerError, err)
+		return
 	}
 
 	status, err := integrationService.CreateRecord(domain, request)
@@ -80,10 +82,12 @@ func UpdateRecord(c *gin.Context) {
 
 	if err != nil {
 		returnValidationError(c, http.StatusBadRequest, nil)
+		return
 	}
 
 	if err := defaults.Set(&request); err != nil {
 		returnValidationError(c, http.StatusInternalServerError, err)
+		return
 	}
 
 	status, err := integrationService.UpdateRecord(domain, request)
@@ -119,14 +123,19 @@ func DeleteRecord(c *gin.Context) {
 
 	err := c.ShouldBindJSON(&request)
 
+	if request.Autocommit == nil {
+		request.Autocommit = new(bool)
+	}
+
 	if err != nil {
-		returnValidationError(c, http.StatusBadRequest, nil)
+		returnValidationError(c, http.StatusBadRequest, err)
+		return
 	}
 
 	status, err := integrationService.DeleteRecord(domain, request.Subdomain, *request.Autocommit)
 
 	if err != nil {
-		c.JSON(status, apiModels.ErrorResponse{
+		c.AbortWithStatusJSON(status, apiModels.ErrorResponse{
 			Error: err.Error(),
 		})
 		return

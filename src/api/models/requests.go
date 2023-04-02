@@ -18,7 +18,7 @@ const (
 
 type SaveRowRequest struct {
 	Subdomain  string      `json:"subdomain" binding:"required"`
-	Data       string      `json:"data" binding:"required"`
+	Data       string      `json:"data"`
 	Type       *RecordType `json:"type,omitempty" default:"A"`
 	TTL        *int        `json:"ttl,omitempty" default:"3600"`
 	Autocommit *bool       `json:"autocommit,omitempty" default:"false"`
