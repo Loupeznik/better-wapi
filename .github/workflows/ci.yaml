@@ -27,7 +27,7 @@ jobs:
 
     - name: Install dependencies
       run: |
-        go install github.com/swaggo/swag/cmd/swag@1.8.0
+        go install github.com/swaggo/swag/cmd/swag@v1.8.0
         go get -d
 
     - name: Build
