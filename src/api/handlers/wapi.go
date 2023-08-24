@@ -19,7 +19,7 @@ func init() {
 }
 
 // CreateRecord	godoc
-// @Summary		Create a new A record
+// @Summary		Create a new record
 // @Tags		domain
 // @Produce		json
 // @Accept		json
@@ -59,7 +59,7 @@ func CreateRecord(c *gin.Context) {
 }
 
 // UpdateRecord	godoc
-// @Summary		Update an existing A record
+// @Summary		Update an existing record
 // @Tags		domain
 // @Produce		json
 // @Accept		json
@@ -99,11 +99,11 @@ func UpdateRecord(c *gin.Context) {
 }
 
 // DeleteRecord	godoc
-// @Summary		Delete an existing A record
+// @Summary		Delete an existing record
 // @Tags		domain
 // @Produce		json
 // @Accept		json
-// @Param 		request	body	apiModels.SaveRowRequest	true	"Request body"
+// @Param 		request	body	apiModels.DeleteRowRequest	true	"Request body"
 // @Param		domain	path	string	true	"Domain"
 // @Success		200
 // @Failure		400	{object}	apiModels.ErrorResponse
@@ -115,7 +115,7 @@ func UpdateRecord(c *gin.Context) {
 // @Router		/domain/{domain}/record [delete]
 func DeleteRecord(c *gin.Context) {
 	domain := c.Param("domain")
-	var request apiModels.SaveRowRequest
+	var request apiModels.DeleteRowRequest
 
 	err := c.ShouldBindJSON(&request)
 

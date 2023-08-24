@@ -23,3 +23,8 @@ type SaveRowRequest struct {
 	TTL        *int        `json:"ttl,omitempty" default:"3600"`
 	Autocommit *bool       `json:"autocommit,omitempty" default:"false"`
 }
+
+type DeleteRowRequest struct {
+	Subdomain  string `json:"subdomain" binding:"required"`
+	Autocommit *bool  `json:"autocommit,omitempty" default:"false"`
+}
