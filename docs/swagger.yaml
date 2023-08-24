@@ -1,5 +1,15 @@
 basePath: /api
 definitions:
+  models.DeleteRowRequest:
+    properties:
+      autocommit:
+        default: false
+        type: boolean
+      subdomain:
+        type: string
+    required:
+    - subdomain
+    type: object
   models.ErrorResponse:
     properties:
       error:
@@ -220,7 +230,7 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/models.SaveRowRequest'
+          $ref: '#/definitions/models.DeleteRowRequest'
       - description: Domain
         in: path
         name: domain
@@ -255,7 +265,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Delete an existing A record
+      summary: Delete an existing record
       tags:
       - domain
     post:
@@ -302,7 +312,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Create a new A record
+      summary: Create a new record
       tags:
       - domain
     put:
@@ -349,7 +359,7 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/models.ErrorResponse'
-      summary: Update an existing A record
+      summary: Update an existing record
       tags:
       - domain
 swagger: "2.0"

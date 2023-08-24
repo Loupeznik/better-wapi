@@ -136,7 +136,7 @@
                 "tags": [
                     "domain"
                 ],
-                "summary": "Update an existing A record",
+                "summary": "Update an existing record",
                 "parameters": [
                     {
                         "description": "Request body",
@@ -207,7 +207,7 @@
                 "tags": [
                     "domain"
                 ],
-                "summary": "Create a new A record",
+                "summary": "Create a new record",
                 "parameters": [
                     {
                         "description": "Request body",
@@ -278,7 +278,7 @@
                 "tags": [
                     "domain"
                 ],
-                "summary": "Delete an existing A record",
+                "summary": "Delete an existing record",
                 "parameters": [
                     {
                         "description": "Request body",
@@ -286,7 +286,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/models.SaveRowRequest"
+                            "$ref": "#/definitions/models.DeleteRowRequest"
                         }
                     },
                     {
@@ -413,6 +413,21 @@
         }
     },
     "definitions": {
+        "models.DeleteRowRequest": {
+            "type": "object",
+            "required": [
+                "subdomain"
+            ],
+            "properties": {
+                "autocommit": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "subdomain": {
+                    "type": "string"
+                }
+            }
+        },
         "models.ErrorResponse": {
             "type": "object",
             "properties": {
