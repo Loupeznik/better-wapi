@@ -25,7 +25,7 @@ func init() {
 // @Accept		json
 // @Param 		request	body	apiModels.SaveRowRequest	true	"Request body"
 // @Param		domain	path	string	true	"Domain"
-// @Success		200
+// @Success		201
 // @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
@@ -55,6 +55,10 @@ func CreateRecord(c *gin.Context) {
 		return
 	}
 
+	if status == 200 {
+		status = http.StatusCreated
+	}
+
 	c.Status(status)
 }
 
@@ -65,7 +69,7 @@ func CreateRecord(c *gin.Context) {
 // @Accept		json
 // @Param 		request	body	apiModels.SaveRowRequest	true	"Request body"
 // @Param		domain	path	string	true	"Domain"
-// @Success		200
+// @Success		204
 // @Failure		400	{object}	apiModels.ErrorResponse
 // @Failure		401	{object}	apiModels.ErrorResponse
 // @Failure		404	{object}	apiModels.ErrorResponse
@@ -93,6 +97,10 @@ func UpdateRecord(c *gin.Context) {
 			Error: err.Error(),
 		})
 		return
+	}
+
+	if status == 200 {
+		status = http.StatusNoContent
 	}
 
 	c.Status(status)
