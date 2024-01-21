@@ -14,17 +14,15 @@ import (
 	"github.com/loupeznik/better-wapi/src/models"
 )
 
-type IntegrationService struct {
-	config  *models.Config
-	baseUrl string
+type MockIntegrationService struct {
+	config *models.Config
 }
 
-func NewIntegrationService(config *models.Config) *IntegrationService {
-	wapiBaseUrl := "https://api.wedos.com/wapi/json"
-	return &IntegrationService{config: config, baseUrl: wapiBaseUrl}
+func NewMockIntegrationService(config *models.Config) *MockIntegrationService {
+	return &MockIntegrationService{config: config}
 }
 
-func (s *IntegrationService) CreateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
+func (s *MockIntegrationService) CreateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
 	data := models.RequestData{
 		Domain:    domain,
 		Subdomain: request.Subdomain,
@@ -38,7 +36,7 @@ func (s *IntegrationService) CreateRecord(domain string, request apiModels.SaveR
 	return status, err
 }
 
-func (s *IntegrationService) UpdateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
+func (s *MockIntegrationService) UpdateRecord(domain string, request apiModels.SaveRowRequest) (int, error) {
 	record, _, _ := s.GetRecord(domain, request.Subdomain)
 	rowID, _ := strconv.Atoi(record.RecordID)
 
@@ -55,7 +53,7 @@ func (s *IntegrationService) UpdateRecord(domain string, request apiModels.SaveR
 	return status, err
 }
 
-func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commit bool) (int, error) {
+func (s *MockIntegrationService) DeleteRecord(domain string, subdomain string, commit bool) (int, error) {
 	record, _, _ := s.GetRecord(domain, subdomain)
 	rowID, _ := strconv.Atoi(record.RecordID)
 
@@ -68,7 +66,7 @@ func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commi
 	return status, err
 }
 
-func (s *IntegrationService) GetInfo(domainName string) ([]models.Record, int, error) {
+func (s *MockIntegrationService) GetInfo(domainName string) ([]models.Record, int, error) {
 	data := models.RequestData{
 		Domain: domainName}
 
@@ -77,7 +75,7 @@ func (s *IntegrationService) GetInfo(domainName string) ([]models.Record, int, e
 	return result.Body.Data.Records, status, err
 }
 
-func (s *IntegrationService) GetRecord(domain string, subdomain string) (models.Record, int, error) {
+func (s *MockIntegrationService) GetRecord(domain string, subdomain string) (models.Record, int, error) {
 	records, status, err := s.GetInfo(domain)
 	var record models.Record
 
@@ -98,7 +96,7 @@ func (s *IntegrationService) GetRecord(domain string, subdomain string) (models.
 	return record, status, nil
 }
 
-func (s *IntegrationService) CommitChanges(domain string) (int, error) {
+func (s *MockIntegrationService) CommitChanges(domain string) (int, error) {
 	data := models.RequestData{
 		Subdomain: domain}
 
@@ -107,7 +105,7 @@ func (s *IntegrationService) CommitChanges(domain string) (int, error) {
 	return status, err
 }
 
-func (s *IntegrationService) makeRequest(command string, data models.RequestData, commit bool) (int, models.WApiResponse, error) {
+func (s *MockIntegrationService) makeRequest(command string, data models.RequestData, commit bool) (int, models.WApiResponse, error) {
 	token := helpers.GetApiToken(s.config.WApiUsername, s.config.WApiPassword)
 	client := &http.Client{Timeout: time.Duration(60) * time.Second}
 
