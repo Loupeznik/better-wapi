@@ -23,14 +23,25 @@ func SetupRoutes(router *gin.Engine) {
 
 	api := router.Group("/api")
 	{
-		domain := api.Group("/domain/:domain", middleware.Authorize())
+		v1 := api.Group("/v1")
 		{
-			domain.POST("/record", handlers.CreateRecord)
-			domain.PUT("/record", handlers.UpdateRecord)
-			domain.GET("/info", handlers.GetDomainInfo)
-			domain.GET("/:subdomain/info", handlers.GetSubdomainInfo)
-			domain.DELETE("/record", handlers.DeleteRecord)
-			domain.POST("commit", handlers.CommitChanges)
+			domain := v1.Group("/domain/:domain", middleware.Authorize())
+			{
+				domain.POST("/record", handlers.CreateRecord)
+				domain.PUT("/record", handlers.UpdateRecord)
+				domain.GET("/info", handlers.GetDomainInfo)
+				domain.GET("/:subdomain/info", handlers.GetSubdomainInfo)
+				domain.DELETE("/record", handlers.DeleteRecord)
+				domain.POST("commit", handlers.CommitChanges)
+			}
+		}
+		v2 := api.Group("/v2")
+		{
+			domain := v2.Group("/domain/:domain", middleware.Authorize())
+			{
+				domain.PUT("/record/:id", handlers.UpdateRecordById)
+				domain.DELETE("/record/:id", handlers.DeleteRecordById)
+			}
 		}
 
 		api.POST("/auth/token", handlers.GetToken)

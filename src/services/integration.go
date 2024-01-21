@@ -56,6 +56,24 @@ func (s *IntegrationService) UpdateRecord(domain string, request apiModels.SaveR
 	return status, err
 }
 
+func (s *IntegrationService) UpdateRecordV2(domain string, rowID int, request apiModels.SaveRowRequestV2) (int, error) {
+	data := models.RequestData{
+		Domain: domain,
+		RowID:  rowID,
+		TTL:    *request.TTL,
+		Type:   string(*request.Type),
+		IP:     request.Data,
+	}
+
+	status, _, err := s.makeRequest("dns-row-update", data, *request.Autocommit)
+
+	if err == nil {
+		status = 204
+	}
+
+	return status, err
+}
+
 func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commit bool) (int, error) {
 	record, _, _ := s.GetRecord(domain, subdomain)
 	rowID, _ := strconv.Atoi(record.RecordID)
@@ -65,6 +83,20 @@ func (s *IntegrationService) DeleteRecord(domain string, subdomain string, commi
 		RowID:  rowID}
 
 	status, _, err := s.makeRequest("dns-row-delete", data, commit)
+
+	return status, err
+}
+
+func (s *IntegrationService) DeleteRecordV2(domain string, rowID int, commit bool) (int, error) {
+	data := models.RequestData{
+		Domain: domain,
+		RowID:  rowID}
+
+	status, _, err := s.makeRequest("dns-row-delete", data, commit)
+
+	if err == nil {
+		status = 204
+	}
 
 	return status, err
 }

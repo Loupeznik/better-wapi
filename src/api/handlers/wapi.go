@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	apiModels "github.com/loupeznik/better-wapi/src/api/models"
@@ -32,7 +34,7 @@ func init() {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
-// @Router		/domain/{domain}/record [post]
+// @Router		/v1/domain/{domain}/record [post]
 func CreateRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.SaveRowRequest
@@ -76,7 +78,7 @@ func CreateRecord(c *gin.Context) {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
-// @Router		/domain/{domain}/record [put]
+// @Router		/v1/domain/{domain}/record [put]
 func UpdateRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.SaveRowRequest
@@ -106,6 +108,53 @@ func UpdateRecord(c *gin.Context) {
 	c.Status(status)
 }
 
+// UpdateRecord	godoc
+// @Summary		Update an existing record
+// @Tags		domain
+// @Produce		json
+// @Accept		json
+// @Param 		request	body	apiModels.SaveRowRequestV2	true	"Request body"
+// @Param		domain	path	string	true	"Domain"
+// @Param		id		path	int		true	"Record ID"
+// @Success		204
+// @Failure		400	{object}	apiModels.ErrorResponse
+// @Failure		401	{object}	apiModels.ErrorResponse
+// @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		409	{object}	apiModels.ErrorResponse
+// @Failure		429	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
+// @Router		/v2/domain/{domain}/record/{id} [put]
+func UpdateRecordById(c *gin.Context) {
+	domain := c.Param("domain")
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		returnValidationError(c, http.StatusBadRequest, errors.New("id not provided"))
+	}
+
+	var request apiModels.SaveRowRequestV2
+	err = c.ShouldBindJSON(&request)
+
+	if err != nil {
+		returnValidationError(c, http.StatusBadRequest, nil)
+	}
+
+	if err := defaults.Set(&request); err != nil {
+		returnValidationError(c, http.StatusInternalServerError, err)
+	}
+
+	status, err := integrationService.UpdateRecordV2(domain, id, request)
+
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(status)
+}
+
 // DeleteRecord	godoc
 // @Summary		Delete an existing record
 // @Tags		domain
@@ -120,7 +169,7 @@ func UpdateRecord(c *gin.Context) {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
-// @Router		/domain/{domain}/record [delete]
+// @Router		/v1/domain/{domain}/record [delete]
 func DeleteRecord(c *gin.Context) {
 	domain := c.Param("domain")
 	var request apiModels.DeleteRowRequest
@@ -132,6 +181,49 @@ func DeleteRecord(c *gin.Context) {
 	}
 
 	status, err := integrationService.DeleteRecord(domain, request.Subdomain, *request.Autocommit)
+
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.Status(status)
+}
+
+// DeleteRecord	godoc
+// @Summary		Delete an existing record
+// @Tags		domain
+// @Produce		json
+// @Accept		json
+// @Param 		request	body	apiModels.DeleteRowRequestV2	true	"Request body"
+// @Param		domain	path	string	true	"Domain"
+// @Param		id		path	int		true	"Record ID"
+// @Success		204
+// @Failure		400	{object}	apiModels.ErrorResponse
+// @Failure		401	{object}	apiModels.ErrorResponse
+// @Failure		404	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
+// @Router		/v2/domain/{domain}/record/{id} [delete]
+func DeleteRecordById(c *gin.Context) {
+	domain := c.Param("domain")
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		returnValidationError(c, http.StatusBadRequest, errors.New("id not provided"))
+	}
+
+	var request apiModels.DeleteRowRequestV2
+
+	err = c.ShouldBindJSON(&request)
+
+	if err != nil {
+		returnValidationError(c, http.StatusBadRequest, err)
+		return
+	}
+
+	status, err := integrationService.DeleteRecordV2(domain, id, *request.Autocommit)
 
 	if err != nil {
 		c.JSON(status, apiModels.ErrorResponse{
@@ -155,7 +247,7 @@ func DeleteRecord(c *gin.Context) {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
-// @Router		/domain/{domain}/info [get]
+// @Router		/v1/domain/{domain}/info [get]
 func GetDomainInfo(c *gin.Context) {
 	domain := c.Param("domain")
 
@@ -184,7 +276,7 @@ func GetDomainInfo(c *gin.Context) {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
-// @Router		/domain/{domain}/{subdomain}/info [get]
+// @Router		/v1/domain/{domain}/{subdomain}/info [get]
 func GetSubdomainInfo(c *gin.Context) {
 	domain := c.Param("domain")
 	subdomain := c.Param("subdomain")
@@ -236,6 +328,7 @@ func returnValidationError(c *gin.Context, status int, err error) {
 		c.AbortWithStatusJSON(status, apiModels.ErrorResponse{
 			Error: err.Error(),
 		})
+		return
 	}
 
 	c.AbortWithStatus(status)

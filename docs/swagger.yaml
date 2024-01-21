@@ -10,6 +10,12 @@ definitions:
     required:
     - subdomain
     type: object
+  models.DeleteRowRequestV2:
+    properties:
+      autocommit:
+        default: false
+        type: boolean
+    type: object
   models.ErrorResponse:
     properties:
       error:
@@ -83,7 +89,23 @@ definitions:
         default: A
     required:
     - data
-    - subdomain
+    type: object
+  models.SaveRowRequestV2:
+    properties:
+      autocommit:
+        default: false
+        type: boolean
+      data:
+        type: string
+      ttl:
+        default: 3600
+        type: integer
+      type:
+        allOf:
+        - $ref: '#/definitions/models.RecordType'
+        default: A
+    required:
+    - data
     type: object
   models.TokenResponse:
     properties:
@@ -129,7 +151,7 @@ paths:
       summary: Get token
       tags:
       - auth
-  /domain/{domain}/{subdomain}/info:
+  /v1/domain/{domain}/{subdomain}/info:
     get:
       parameters:
       - description: Domain
@@ -176,7 +198,7 @@ paths:
       summary: Get DNS record for a specific subdomain
       tags:
       - domain
-  /domain/{domain}/info:
+  /v1/domain/{domain}/info:
     get:
       parameters:
       - description: Domain
@@ -220,7 +242,7 @@ paths:
       summary: Get all DNS records for a domain
       tags:
       - domain
-  /domain/{domain}/record:
+  /v1/domain/{domain}/record:
     delete:
       consumes:
       - application/json
@@ -330,6 +352,103 @@ paths:
         name: domain
         required: true
         type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "429":
+          description: Too Many Requests
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Update an existing record
+      tags:
+      - domain
+  /v2/domain/{domain}/record/{id}:
+    delete:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.DeleteRowRequestV2'
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: Record ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Delete an existing record
+      tags:
+      - domain
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Request body
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/models.SaveRowRequestV2'
+      - description: Domain
+        in: path
+        name: domain
+        required: true
+        type: string
+      - description: Record ID
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:

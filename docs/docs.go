@@ -65,7 +65,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/domain/{domain}/info": {
+        "/v1/domain/{domain}/info": {
             "get": {
                 "produces": [
                     "application/json"
@@ -132,7 +132,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/domain/{domain}/record": {
+        "/v1/domain/{domain}/record": {
             "put": {
                 "consumes": [
                     "application/json"
@@ -347,7 +347,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/domain/{domain}/{subdomain}/info": {
+        "/v1/domain/{domain}/{subdomain}/info": {
             "get": {
                 "produces": [
                     "application/json"
@@ -417,6 +417,152 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v2/domain/{domain}/record/{id}": {
+            "put": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Update an existing record",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.SaveRowRequestV2"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Domain",
+                        "name": "domain",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Record ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "429": {
+                        "description": "Too Many Requests",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domain"
+                ],
+                "summary": "Delete an existing record",
+                "parameters": [
+                    {
+                        "description": "Request body",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.DeleteRowRequestV2"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Domain",
+                        "name": "domain",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Record ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -432,6 +578,15 @@ const docTemplate = `{
                 },
                 "subdomain": {
                     "type": "string"
+                }
+            }
+        },
+        "models.DeleteRowRequestV2": {
+            "type": "object",
+            "properties": {
+                "autocommit": {
+                    "type": "boolean",
+                    "default": false
                 }
             }
         },
@@ -512,8 +667,7 @@ const docTemplate = `{
         "models.SaveRowRequest": {
             "type": "object",
             "required": [
-                "data",
-                "subdomain"
+                "data"
             ],
             "properties": {
                 "autocommit": {
@@ -524,6 +678,33 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "subdomain": {
+                    "type": "string"
+                },
+                "ttl": {
+                    "type": "integer",
+                    "default": 3600
+                },
+                "type": {
+                    "default": "A",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/models.RecordType"
+                        }
+                    ]
+                }
+            }
+        },
+        "models.SaveRowRequestV2": {
+            "type": "object",
+            "required": [
+                "data"
+            ],
+            "properties": {
+                "autocommit": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "data": {
                     "type": "string"
                 },
                 "ttl": {
