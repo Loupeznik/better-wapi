@@ -8,6 +8,7 @@ import sys
 import json
 from time import sleep
 
+
 def get_tld(validation_domain):
     tld_pattern = r'\.([^.]+\.[^.]+)$'
     match = re.search(tld_pattern, validation_domain)
@@ -17,8 +18,10 @@ def get_tld(validation_domain):
     else:
         return None
 
+
 def get_validation_subdomain(validation_domain, domain):
     return validation_domain.replace('.' + domain, '')
+
 
 def authorize():
     payload = {
@@ -26,13 +29,15 @@ def authorize():
         'secret': os.environ.get('BW_USER_SECRET')
     }
 
-    response = requests.post(os.environ.get('BW_BASE_URL') + '/api/auth/token', json=payload)
+    response = requests.post(os.environ.get(
+        'BW_BASE_URL') + '/api/auth/token', json=payload)
 
     if response.status_code == 200:
         return response.json()['token']
 
     print('Error authorizing. Response code: ' + str(response.status_code))
     raise Exception('Authorization error')
+
 
 def perform_dns_challenge(validation_domain, validation_token):
     domain = get_tld(validation_domain)
@@ -50,14 +55,16 @@ def perform_dns_challenge(validation_domain, validation_token):
         'type': 'TXT'
     })
 
-    response = requests.post(os.environ.get('BW_BASE_URL') + '/api/domain/' + domain + '/record', data=payload, headers=headers)
+    response = requests.post(os.environ.get(
+        'BW_BASE_URL') + '/api/v1/domain/' + domain + '/record', data=payload, headers=headers)
 
-    if response.status_code == 200:
+    if response.status_code == 201:
         sleep(600)
         print('DNS challenge completed successfully.')
     else:
         print('Error performing DNS challenge.')
         raise Exception('DNS challenge failed.')
+
 
 def cleanup_dns_challenge(validation_domain, validation_token):
     domain = get_tld(validation_domain)
@@ -75,14 +82,16 @@ def cleanup_dns_challenge(validation_domain, validation_token):
         'type': 'TXT'
     })
 
-    response = requests.delete(os.environ.get('BW_BASE_URL') + '/api/domain/' + domain
+    response = requests.delete(os.environ.get('BW_BASE_URL') + '/api/v1/domain/' + domain
                                + '/record/', data=payload, headers=headers)
 
     if response.status_code == 200:
         print('DNS challenge cleanup completed successfully.')
     else:
         print('Error performing DNS challenge cleanup.')
+        print('Response: ' + response.text)
         raise Exception('DNS challenge cleanup failed.')
+
 
 if __name__ == '__main__':
     load_dotenv()
