@@ -306,6 +306,7 @@ func GetSubdomainInfo(c *gin.Context) {
 // @Failure		409	{object}	apiModels.ErrorResponse
 // @Failure		429	{object}	apiModels.ErrorResponse
 // @Failure		500	{object}	apiModels.ErrorResponse
+// @Router		/v1/domain/{domain}/commit [post]
 func CommitChanges(c *gin.Context) {
 	domain := c.Param("domain")
 
