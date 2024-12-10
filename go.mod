@@ -1,6 +1,6 @@
 module github.com/loupeznik/better-wapi
 
-go 1.20
+go 1.23
 
 require (
 	github.com/gin-contrib/cors v1.6.0
