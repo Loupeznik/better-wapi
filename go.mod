@@ -12,8 +12,11 @@ require (
 )
 
 require (
+	github.com/auth0/go-jwt-middleware/v2 v2.2.2 // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	gopkg.in/go-jose/go-jose.v2 v2.6.3 // indirect
 )
 
 require (
