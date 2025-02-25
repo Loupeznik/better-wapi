@@ -3,6 +3,7 @@ module github.com/loupeznik/better-wapi
 go 1.23
 
 require (
+	github.com/auth0/go-jwt-middleware/v2 v2.2.2
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-gonic/gin v1.9.1
 	github.com/joho/godotenv v1.5.1
@@ -12,7 +13,6 @@ require (
 )
 
 require (
-	github.com/auth0/go-jwt-middleware/v2 v2.2.2 // indirect
 	github.com/chenzhuoyu/iasm v0.9.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	golang.org/x/sync v0.8.0 // indirect

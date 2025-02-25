@@ -36,7 +36,7 @@ func main() {
 
 	router.Use(cors.New(corsConfig))
 
-	api.SetupRoutes(router)
+	api.SetupRoutes(router, config.AuthMode)
 
 	err := router.Run("0.0.0.0:8000")
 	if err != nil {

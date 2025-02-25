@@ -18,13 +18,16 @@ func SetupIntegrationConfig() *models.Config {
 	}
 
 	config := models.Config{
-		UserLogin:    os.Getenv("BW_USER_LOGIN"),
-		UserSecret:   os.Getenv("BW_USER_SECRET"),
-		WApiUsername: os.Getenv("BW_WAPI_USERNAME"),
-		WApiPassword: os.Getenv("BW_WAPI_PASSWORD"),
-		BaseUrl:      os.Getenv("BW_BASE_URL"),
-		UseLogFile:   useLogFile,
-		JsonWebKey:   os.Getenv("BW_JSON_WEB_KEY"),
+		UserLogin:     os.Getenv("BW_USER_LOGIN"),
+		UserSecret:    os.Getenv("BW_USER_SECRET"),
+		WApiUsername:  os.Getenv("BW_WAPI_USERNAME"),
+		WApiPassword:  os.Getenv("BW_WAPI_PASSWORD"),
+		BaseUrl:       os.Getenv("BW_BASE_URL"),
+		UseLogFile:    useLogFile,
+		JsonWebKey:    os.Getenv("BW_JSON_WEB_KEY"),
+		AuthMode:      models.AuthMode(os.Getenv("BW_AUTH_MODE")),
+		OAuthIssuer:   os.Getenv("BW_OAUTH2_ISSUER_URL"),
+		OAuthAudience: os.Getenv("BW_OAUTH2_AUDIENCE"),
 	}
 
 	return &config

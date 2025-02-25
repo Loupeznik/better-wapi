@@ -35,6 +35,7 @@ func (s *AuthService) IssueToken(credentials models.Login) (string, error) {
 		credentials.Login,
 		jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Hour * 12).Unix(),
+			Issuer:    "https://github.com/loupeznik/better-wapi",
 		},
 	}
 

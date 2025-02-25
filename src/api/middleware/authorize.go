@@ -18,8 +18,7 @@ func init() {
 	authService = services.NewAuthService(config)
 }
 
-// Deprecated
-func AuthorizeBasic(config *models.Config) gin.HandlerFunc {
+func AuthorizeBasic() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := strings.SplitN(c.Request.Header.Get("Authorization"), " ", 2)
 		if len(auth) != 2 || auth[0] != "Basic" {
@@ -43,7 +42,7 @@ func AuthorizeBasic(config *models.Config) gin.HandlerFunc {
 	}
 }
 
-func Authorize() gin.HandlerFunc {
+func AuthorizeInternalJwt() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		auth := strings.SplitN(c.Request.Header.Get("Authorization"), " ", 2)
 		if len(auth) != 2 || auth[0] != "Bearer" {

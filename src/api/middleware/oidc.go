@@ -5,7 +5,6 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strings"
 	"time"
 
@@ -13,18 +12,26 @@ import (
 	"github.com/auth0/go-jwt-middleware/v2/jwks"
 	"github.com/auth0/go-jwt-middleware/v2/validator"
 	"github.com/gin-gonic/gin"
+	"github.com/loupeznik/better-wapi/src/helpers"
+	"github.com/loupeznik/better-wapi/src/models"
 )
 
 type CustomClaims struct {
 	Scope string `json:"scope"`
 }
 
+var config *models.Config
+
+func init() {
+	config = helpers.SetupIntegrationConfig()
+}
+
 func (c CustomClaims) Validate(ctx context.Context) error {
 	return nil
 }
 
-func EnsureValidToken() gin.HandlerFunc {
-	issuerURL, err := url.Parse(os.Getenv("BW_OAUTH2_ISSUER_URL"))
+func AuthorizeOAuthJwt() gin.HandlerFunc {
+	issuerURL, err := url.Parse(config.OAuthIssuer)
 	if err != nil {
 		log.Fatalf("Failed to parse the issuer url: %v", err)
 	}
@@ -35,7 +42,7 @@ func EnsureValidToken() gin.HandlerFunc {
 		provider.KeyFunc,
 		validator.RS256,
 		issuerURL.String(),
-		[]string{os.Getenv("BW_OAUTH2_AUDIENCE")},
+		[]string{config.OAuthAudience},
 		validator.WithCustomClaims(
 			func() validator.CustomClaims {
 				return &CustomClaims{}
@@ -52,7 +59,6 @@ func EnsureValidToken() gin.HandlerFunc {
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusUnauthorized)
-		w.Write([]byte(`{"message":"Failed to validate JWT."}`))
 	}
 
 	middleware := jwtmiddleware.New(
