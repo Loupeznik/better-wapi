@@ -3,6 +3,7 @@ package helpers
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/joho/godotenv"
 	"github.com/loupeznik/better-wapi/src/models"
@@ -28,7 +29,17 @@ func SetupIntegrationConfig() *models.Config {
 		AuthMode:      models.AuthMode(os.Getenv("BW_AUTH_MODE")),
 		OAuthIssuer:   os.Getenv("BW_OAUTH2_ISSUER_URL"),
 		OAuthAudience: os.Getenv("BW_OAUTH2_AUDIENCE"),
+		OAuthAllowedRoles: resolveOAuthAllowedRoles(),
 	}
 
 	return &config
+}
+
+func resolveOAuthAllowedRoles() []string {
+	roles := os.Getenv("BW_OAUTH2_ALLOWED_ROLES")
+	if roles == "" {
+		return nil
+	}
+
+	return strings.Split(roles, ",")
 }

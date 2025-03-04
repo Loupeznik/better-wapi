@@ -9,14 +9,15 @@ const (
 )
 
 type Config struct {
-	UserLogin     string
-	UserSecret    string
-	WApiUsername  string
-	WApiPassword  string
-	BaseUrl       string
-	UseLogFile    bool
-	JsonWebKey    string
-	AuthMode      AuthMode
-	OAuthIssuer   string
-	OAuthAudience string
+	UserLogin         string
+	UserSecret        string
+	WApiUsername      string
+	WApiPassword      string
+	BaseUrl           string
+	UseLogFile        bool
+	JsonWebKey        string
+	AuthMode          AuthMode
+	OAuthIssuer       string
+	OAuthAudience     string
+	OAuthAllowedRoles []string // Use empty string to skip role checks, if defined, roles need to be separated by commas
 }
