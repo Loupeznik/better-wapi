@@ -78,7 +78,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           push: true
           tags: |
-            loupeznik/better-wapi-webapp:preview-${{ github.sha }}
+            loupeznik/better-wapi:preview-${{ github.sha }}
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v4.0.0
