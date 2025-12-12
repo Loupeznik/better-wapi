@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/loupeznik/better-wapi/src/helpers"
 	"github.com/loupeznik/better-wapi/src/models"
 )
@@ -15,7 +15,7 @@ type AuthService struct {
 
 type authCustomClaims struct {
 	Login string `json:"login"`
-	jwt.StandardClaims
+	jwt.RegisteredClaims
 }
 
 func NewAuthService(config *models.Config) *AuthService {
@@ -33,8 +33,8 @@ func (s *AuthService) IssueToken(credentials models.Login) (string, error) {
 
 	claims := &authCustomClaims{
 		credentials.Login,
-		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 12).Unix(),
+		jwt.RegisteredClaims{
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Hour * 12)),
 		},
 	}
 
