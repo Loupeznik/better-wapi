@@ -1,4 +1,4 @@
-FROM golang:1.25-alpine as builder
+FROM golang:1.25-alpine AS builder
 
 RUN apk update && apk add --no-cache alpine-sdk git tzdata
 
