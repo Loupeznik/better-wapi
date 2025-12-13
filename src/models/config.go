@@ -20,4 +20,5 @@ type Config struct {
 	OAuthIssuer       string
 	OAuthAudience     string
 	OAuthAllowedRoles []string // Use empty string to skip role checks, if defined, roles need to be separated by commas
+	MockMode          bool
 }

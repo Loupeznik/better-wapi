@@ -13,11 +13,15 @@ import (
 	"github.com/loupeznik/better-wapi/src/services"
 )
 
-var integrationService *services.IntegrationService
+var integrationService services.DNSService
 
 func init() {
 	config := helpers.SetupIntegrationConfig()
-	integrationService = services.NewIntegrationService(config)
+	if config.MockMode {
+		integrationService = services.NewMockService()
+	} else {
+		integrationService = services.NewIntegrationService(config)
+	}
 }
 
 // CreateRecord	godoc

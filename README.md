@@ -39,6 +39,7 @@ Fill the .env file with your credentials.
 - The BW_WAPI_ variables are your WAPI credentials from the WEDOS management dashboard
 - The BW_USER_ variables are credentials to use within your API
 - The BW_JSON_WEB_KEY is a key used for JWT signing (always fill this to secure your API)
+- The BW_MOCK_MODE variable enables mock mode for testing and demo purposes (set to true to enable)
 
 Alternatively, it is possible to use environment variables without using the .env file.
 
@@ -59,6 +60,25 @@ go run .
 ```
 
 For production workloads, a web server like NGINX is needed, the .env file also needs to be present.
+
+## Mock Mode
+
+Mock mode allows you to run the API without connecting to the WEDOS WAPI service. This is useful for:
+- Testing the API without affecting real DNS records
+- Demo and development purposes
+- Running the API without WEDOS credentials
+
+To enable mock mode, set `BW_MOCK_MODE=true` in your .env file or environment variables. When mock mode is enabled:
+- The API runs with predefined mock domains (example.com, demo.net, test.org)
+- All CRUD operations work with in-memory storage
+- No WAPI credentials are required
+- Changes are not persisted between restarts
+
+Mock mode supports all API endpoints including:
+- Listing domains
+- Creating, updating, and deleting DNS records
+- Getting domain and record information
+- Committing changes (simulated)
 
 ## Running in Docker
 
