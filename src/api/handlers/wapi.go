@@ -322,6 +322,27 @@ func CommitChanges(c *gin.Context) {
 	c.Status(status)
 }
 
+// ListDomains godoc
+// @Summary		Get list of all domains
+// @Tags		domains
+// @Produce		json
+// @Success		200	{object}	[]models.Domain
+// @Failure		401	{object}	apiModels.ErrorResponse
+// @Failure		500	{object}	apiModels.ErrorResponse
+// @Router		/v2/domains [get]
+func ListDomains(c *gin.Context) {
+	result, status, err := integrationService.ListDomains()
+
+	if err != nil {
+		c.JSON(status, apiModels.ErrorResponse{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(status, result)
+}
+
 func returnValidationError(c *gin.Context, status int, err error) {
 	c.Header("Content-Type", "application/problem+json")
 

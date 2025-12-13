@@ -140,6 +140,23 @@ func (s *IntegrationService) CommitChanges(domain string) (int, error) {
 	return status, err
 }
 
+func (s *IntegrationService) ListDomains() ([]models.Domain, int, error) {
+	data := models.RequestData{}
+
+	status, result, err := s.makeRequest("domains-list", data, false)
+
+	if err != nil {
+		return nil, status, err
+	}
+
+	domains := make([]models.Domain, 0, len(result.Body.Data.DomainsMap))
+	for _, domain := range result.Body.Data.DomainsMap {
+		domains = append(domains, domain)
+	}
+
+	return domains, status, nil
+}
+
 func getApiToken(username string, password string) string {
 	passwordHash := sha1.New()
 	passwordHash.Write([]byte(password))

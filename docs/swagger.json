@@ -620,6 +620,40 @@
                     }
                 }
             }
+        },
+        "/v2/domains": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "domains"
+                ],
+                "summary": "Get list of all domains",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Domain"
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/models.ErrorResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -644,6 +678,17 @@
                 "autocommit": {
                     "type": "boolean",
                     "default": false
+                }
+            }
+        },
+        "models.Domain": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
                 }
             }
         },

@@ -22,3 +22,5 @@ go.work
 .env
 .idea
 logs
+
+_tmp

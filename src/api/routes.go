@@ -55,6 +55,8 @@ func SetupRoutes(router *gin.Engine, authMode models.AuthMode) {
 		}
 		v2 := api.Group("/v2")
 		{
+			v2.GET("/domains", ResolveMiddleware(authMode), handlers.ListDomains)
+
 			domain := v2.Group("/domain/:domain", ResolveMiddleware(authMode))
 			{
 				domain.PUT("/record/:id", handlers.UpdateRecordById)

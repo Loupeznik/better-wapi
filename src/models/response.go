@@ -14,7 +14,8 @@ type ResponseBody struct {
 }
 
 type ResponseRow struct {
-	Records []Record `json:"row,omitempty"`
+	Records    []Record           `json:"row,omitempty"`
+	DomainsMap map[string]Domain  `json:"domain,omitempty"`
 }
 
 type Record struct {
@@ -25,4 +26,9 @@ type Record struct {
 	IP        string `json:"rdata,omitempty"`
 	UpdatedAt string `json:"changed_date,omitempty"`
 	Comment   string `json:"author_comment,omitempty"`
+}
+
+type Domain struct {
+	Name   string `json:"name"`
+	Status string `json:"status"`
 }
