@@ -14,8 +14,24 @@ type ResponseBody struct {
 }
 
 type ResponseRow struct {
-	Records    []Record           `json:"row,omitempty"`
-	DomainsMap map[string]Domain  `json:"domain,omitempty"`
+	Records []Record `json:"row,omitempty"`
+}
+
+type DomainsListResponseBody struct {
+	StatusCode   int                   `json:"code"`
+	ResultStatus string                `json:"result"`
+	Timestamp    int64                 `json:"timestamp,omitempty"`
+	RequestID    string                `json:"svTRID,omitempty"`
+	Command      string                `json:"command,omitempty"`
+	Data         DomainsListDataRow    `json:"data,omitempty"`
+}
+
+type DomainsListDataRow struct {
+	DomainsMap map[string]Domain `json:"domain,omitempty"`
+}
+
+type DomainsListResponse struct {
+	Body DomainsListResponseBody `json:"response"`
 }
 
 type Record struct {

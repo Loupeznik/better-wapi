@@ -143,7 +143,7 @@ func (s *IntegrationService) CommitChanges(domain string) (int, error) {
 func (s *IntegrationService) ListDomains() ([]models.Domain, int, error) {
 	data := models.RequestData{}
 
-	status, result, err := s.makeRequest("domains-list", data, false)
+	status, result, err := s.makeDomainsListRequest(data)
 
 	if err != nil {
 		return nil, status, err
@@ -155,6 +155,51 @@ func (s *IntegrationService) ListDomains() ([]models.Domain, int, error) {
 	}
 
 	return domains, status, nil
+}
+
+func (s *IntegrationService) makeDomainsListRequest(data models.RequestData) (int, models.DomainsListResponse, error) {
+	token := getApiToken(s.config.WApiUsername, s.config.WApiPassword)
+	client := &http.Client{Timeout: time.Duration(60) * time.Second}
+
+	request := &models.Request{Body: models.RequestBody{
+		Login:   s.config.WApiUsername,
+		Secret:  token,
+		Command: "domains-list",
+		Data:    data,
+	}}
+
+	var result models.DomainsListResponse
+
+	response, err := client.Do(helpers.BuildRequest(s.baseUrl, request))
+	if err != nil {
+		helpers.Log("error", fmt.Sprintf("Request to WAPI failed: %s", err.Error()))
+		return 500, result, err
+	}
+
+	defer func(Body io.ReadCloser) {
+		err := Body.Close()
+		if err != nil {
+			helpers.Log("error", fmt.Sprintf("Failed to read response body: %s", err.Error()))
+		}
+	}(response.Body)
+
+	bodyBytes, err := io.ReadAll(response.Body)
+	if err != nil {
+		return 500, result, err
+	}
+
+	err = json.Unmarshal(bodyBytes, &result)
+	if err != nil {
+		return 500, result, err
+	}
+
+	status, err := helpers.ResolveStatusCode(result.Body.StatusCode)
+
+	if err == nil && status >= 400 {
+		err = errors.New(result.Body.ResultStatus)
+	}
+
+	return status, result, err
 }
 
 func getApiToken(username string, password string) string {
