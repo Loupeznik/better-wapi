@@ -67,7 +67,11 @@ def perform_dns_challenge(validation_domain, validation_token):
     )
 
     if response.status_code == 201:
-        sleep(600)
+        print("DNS TXT record created for " + validation_domain)
+        remaining = int(os.environ.get("CERTBOT_REMAINING_CHALLENGES", "0"))
+        if remaining == 0:
+            print("All challenges created. Waiting 120s for DNS propagation...")
+            sleep(120)
         print("DNS challenge completed successfully.")
     else:
         print("Error performing DNS challenge.")
