@@ -21,6 +21,8 @@ def get_tld(validation_domain):
 
 
 def get_validation_subdomain(validation_domain, domain):
+    if validation_domain == domain:
+        return ""
     return validation_domain.replace("." + domain, "")
 
 
@@ -49,12 +51,14 @@ def perform_dns_challenge(validation_domain, validation_token):
         "Content-Type": "application/json",
     }
 
+    validation_sub = get_validation_subdomain(validation_domain, domain)
+    subdomain = "_acme-challenge" + ("." + validation_sub if validation_sub else "")
+
     payload = json.dumps(
         {
             "autocommit": True,
             "data": validation_token,
-            "subdomain": "_acme-challenge."
-            + get_validation_subdomain(validation_domain, domain),
+            "subdomain": subdomain,
             "ttl": 300,
             "type": "TXT",
         }
@@ -86,12 +90,14 @@ def cleanup_dns_challenge(validation_domain, validation_token):
         "Content-Type": "application/json",
     }
 
+    validation_sub = get_validation_subdomain(validation_domain, domain)
+    subdomain = "_acme-challenge" + ("." + validation_sub if validation_sub else "")
+
     payload = json.dumps(
         {
             "autocommit": True,
             "data": validation_token,
-            "subdomain": "_acme-challenge."
-            + get_validation_subdomain(validation_domain, domain),
+            "subdomain": subdomain,
             "ttl": 300,
             "type": "TXT",
         }
