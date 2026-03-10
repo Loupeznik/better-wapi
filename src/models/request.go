@@ -12,7 +12,7 @@ type RequestBody struct {
 }
 
 type RequestData struct {
-	Domain    string `json:"domain"`
+	Domain    string `json:"domain,omitempty"`
 	Subdomain string `json:"name"`
 	TTL       int    `json:"ttl,omitempty"`
 	Type      string `json:"type,omitempty"`
