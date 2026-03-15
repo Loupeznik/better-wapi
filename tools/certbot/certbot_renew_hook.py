@@ -12,7 +12,8 @@ from time import sleep
 
 CHALLENGE_DOMAINS_FILE = "/tmp/certbot_challenge_domains.json"
 DNS_POLL_INTERVAL = 15
-DNS_POLL_TIMEOUT = 300
+DNS_POLL_TIMEOUT = 600
+DNS_INITIAL_WAIT = 60
 NAMESERVER = "ns.wedos.cz"
 
 
@@ -164,6 +165,8 @@ def check_dns_txt(fqdn, expected_token):
 
 
 def wait_for_dns_propagation(challenge_domains):
+    print(f"Waiting {DNS_INITIAL_WAIT}s for initial DNS propagation before polling...")
+    sleep(DNS_INITIAL_WAIT)
     print(
         f"Polling DNS for {len(challenge_domains)} challenge record(s) "
         f"(interval={DNS_POLL_INTERVAL}s, timeout={DNS_POLL_TIMEOUT}s)..."
